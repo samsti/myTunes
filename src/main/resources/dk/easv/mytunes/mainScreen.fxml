@@ -1,16 +1,113 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.geometry.Insets?>
-<?import javafx.scene.control.Label?>
-<?import javafx.scene.layout.VBox?>
-
 <?import javafx.scene.control.Button?>
-<VBox alignment="CENTER" spacing="20.0" xmlns:fx="http://javafx.com/fxml"
-      fx:controller="dk.easv.mytunes.ui.MainController">
-    <padding>
-        <Insets bottom="20.0" left="20.0" right="20.0" top="20.0"/>
-    </padding>
+<?import javafx.scene.control.ChoiceBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ListView?>
+<?import javafx.scene.control.Slider?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
 
-    <Label fx:id="welcomeText"/>
-    <Button text="Hello!" onAction="#onHelloButtonClick"/>
-</VBox>
+<StackPane fx:id="rootPane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="600.0" prefWidth="800.0" stylesheets="@css/popUp.css" xmlns="http://javafx.com/javafx/22" xmlns:fx="http://javafx.com/fxml/1" fx:controller="dk.easv.mytunes.ui.MainController">
+   <children>
+      <AnchorPane prefHeight="600.0" prefWidth="800.0">
+         <children>
+            <Button fx:id="btnBack" layoutX="15.0" layoutY="58.0" mnemonicParsing="false" text="Back" />
+            <Button fx:id="btnPlay" layoutX="66.0" layoutY="58.0" mnemonicParsing="false" text="Play" />
+            <Button fx:id="btnNext" layoutX="114.0" layoutY="58.0" mnemonicParsing="false" text="Next" />
+            <Slider fx:id="sldVolume" layoutX="15.0" layoutY="89.0" />
+            <Label fx:id="lblPlaying" layoutX="360.0" layoutY="88.0" text="Now playing ...." />
+            <TextField fx:id="txtFilter" layoutX="582.0" layoutY="84.0" promptText="Filter" />
+            <Button fx:id="btnFilter" layoutX="743.0" layoutY="84.0" mnemonicParsing="false" text="Filter" />
+            <ListView layoutX="14.0" layoutY="148.0" prefHeight="394.0" prefWidth="200.0" />
+            <ListView layoutX="223.0" layoutY="148.0" prefHeight="394.0" prefWidth="200.0" />
+            <TableView layoutX="457.0" layoutY="148.0" prefHeight="394.0" prefWidth="332.0">
+              <columns>
+                <TableColumn prefWidth="75.0" text="C1" />
+                <TableColumn prefWidth="75.0" text="C2" />
+                  <TableColumn prefWidth="75.0" text="C3" />
+                  <TableColumn prefWidth="75.0" text="C4" />
+              </columns>
+            </TableView>
+            <Button fx:id="btnNewPlayList" layoutX="26.0" layoutY="551.0" mnemonicParsing="false" onAction="#newPlaylistClicked" text="New" />
+            <Button fx:id="btnEditPlayList" layoutX="85.0" layoutY="551.0" mnemonicParsing="false" text="Edit" />
+            <Button fx:id="btnDeletePlayList" layoutX="155.0" layoutY="551.0" mnemonicParsing="false" text="Delete" />
+            <Label layoutX="14.0" layoutY="125.0" text="Playlists" />
+            <Label layoutX="223.0" layoutY="125.0" text="Songs on Playlist" />
+            <Label layoutX="457.0" layoutY="125.0" text="Songs" />
+            <Button fx:id="btnAddSongToPlayList" layoutX="426.0" layoutY="148.0" mnemonicParsing="false" text="&lt;-" />
+            <Button fx:id="btnMoveSongUp" layoutX="254.0" layoutY="551.0" mnemonicParsing="false" text="▲" />
+            <Button fx:id="btnMoveSongDown" layoutX="286.0" layoutY="551.0" mnemonicParsing="false" text="▼" />
+            <Button fx:id="btnDeleteFromPlaylist" layoutX="334.0" layoutY="551.0" mnemonicParsing="false" text="Button" />
+            <Button fx:id="btnNewSong" layoutX="464.0" layoutY="551.0" mnemonicParsing="false" onAction="#btnNewSongClicked" text="New" />
+            <Button fx:id="btnEditSong" layoutX="519.0" layoutY="551.0" mnemonicParsing="false" text="Edit" />
+            <Button fx:id="btnDeleteSong" layoutX="571.0" layoutY="551.0" mnemonicParsing="false" text="Delete" />
+            <Button fx:id="btnClose" layoutX="706.0" layoutY="551.0" mnemonicParsing="false" text="Close" />
+         </children>
+      </AnchorPane>
+      <VBox fx:id="popupBg" prefHeight="600" prefWidth="800" styleClass="popup-bg" visible="false" />
+            <VBox fx:id="popupVBox" alignment="CENTER" maxHeight="150" maxWidth="450" prefHeight="150.0" prefWidth="450.0" styleClass="popup-vbox" visible="false">
+               <children>
+                  <HBox prefHeight="100.0" prefWidth="200.0">
+                     <children>
+                        <Label text="Name">
+                           <HBox.margin>
+                              <Insets left="10.0" top="20.0" />
+                           </HBox.margin>
+                        </Label>
+                        <TextField fx:id="txtNewPlaylist" promptText="Name your playlist">
+                           <HBox.margin>
+                              <Insets left="20.0" top="20.0" />
+                           </HBox.margin>
+                        </TextField>
+                     </children>
+                  </HBox>
+                  <HBox prefHeight="100.0" prefWidth="200.0">
+                     <children>
+                        <Button mnemonicParsing="false" onAction="#cancelButtonClicked" text="Cancel">
+                           <HBox.margin>
+                              <Insets right="20.0" />
+                           </HBox.margin>
+                        </Button>
+                        <Button mnemonicParsing="false" onAction="#saveButtonClicked" text="Save" />
+                     </children>
+                     <padding>
+                        <Insets left="200.0" />
+                     </padding>
+                  </HBox>
+               </children>
+            </VBox>
+      <VBox fx:id="popupNewSong" maxHeight="400.0" maxWidth="500.0" prefHeight="400.0" prefWidth="500.0" styleClass="popup-vbox" visible="false">
+         <children>
+            <AnchorPane prefHeight="300.0" prefWidth="400.0">
+               <children>
+                  <Label layoutX="-2.0" layoutY="72.0" text="Artist:" />
+                  <Label layoutX="-2.0" layoutY="-2.0" text="New / Edit song">
+                     <font>
+                        <Font name="System Bold" size="12.0" />
+                     </font>
+                  </Label>
+                  <Label layoutY="26.0" text="Title: " />
+                  <TextField fx:id="txtSongTitle" layoutX="133.0" layoutY="7.0" maxHeight="20.0" prefHeight="20.0" prefWidth="200.0" promptText="Song Title" />
+                  <TextField fx:id="txtSongArtist" layoutX="133.0" layoutY="61.0" maxHeight="30.0" prefHeight="30.0" prefWidth="200.0" promptText="Artist" />
+                  <ChoiceBox fx:id="choiceCategory" layoutY="120.0" prefWidth="150.0" />
+                  <Button fx:id="btnAddCategory" layoutX="171.0" layoutY="120.0" mnemonicParsing="false" prefWidth="100.0" text="More" />
+                  <Label layoutY="178.0" text="Time: " />
+                  <TextField fx:id="txtTime" layoutX="50.0" layoutY="171.0" maxHeight="30.0" prefHeight="30.0" prefWidth="50.0" promptText="4:23" />
+                  <TextField fx:id="txtFilePath" layoutX="-2.0" layoutY="216.0" prefWidth="200.0" />
+                  <Button fx:id="btnChoose" layoutX="222.0" layoutY="216.0" mnemonicParsing="false" text="Choose" />
+                  <Button fx:id="btnSaveSong" layoutX="391.0" layoutY="261.0" mnemonicParsing="false" text="Save" />
+                  <Button fx:id="btnCancelSong" layoutX="307.0" layoutY="261.0" mnemonicParsing="false" onAction="#btnCancelSongClicked" text="Cancel" />
+               </children>
+            </AnchorPane>
+         </children>
+      </VBox>
+   </children>
+</StackPane>

@@ -1,0 +1,14 @@
+.popup-vbox {
+    -fx-background-color: gray;
+    -fx-border-color: black;
+    -fx-border-width: 2px;
+    -fx-border-radius: 10px;
+    -fx-background-radius: 10px;
+    -fx-padding: 15px;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.5), 10, 0, 0, 3);
+    -fx-opacity: 1;
+}
+.popup-bg {
+    -fx-background-color: gray;
+    -fx-opacity: 0.15;
+}
