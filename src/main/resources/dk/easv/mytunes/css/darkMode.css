@@ -1,0 +1,136 @@
+/* General styling for the entire application */
+.root {
+    -fx-background-color: linear-gradient(to bottom, #222, #111); /* Dark gradient background */
+    -fx-font-family: "Arial";
+    -fx-font-size: 12px;
+    -fx-text-fill: white;
+}
+
+/* Buttons */
+.button {
+    -fx-background-color: linear-gradient(to bottom, #333, #111),
+    linear-gradient(to bottom, #666, #444);
+    -fx-background-radius: 3px;
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-border-color: #999;
+    -fx-border-radius: 3px;
+    -fx-padding: 4 8;
+}
+
+.button:hover {
+    -fx-background-color: linear-gradient(to bottom, #444, #222),
+    linear-gradient(to bottom, #888, #666);
+}
+
+/* Slider styling */
+.slider {
+    -fx-control-inner-background: #333;
+}
+
+.slider .thumb {
+    -fx-background-color: #999;
+    -fx-background-insets: 0, 1;
+}
+
+.slider .track {
+    -fx-background-color: #444;
+    -fx-background-radius: 2px;
+}
+
+/* Labels */
+.label {
+    -fx-text-fill: white;
+}
+
+/* TextField for filtering */
+.text-field {
+    -fx-background-color: #222;
+    -fx-text-fill: white;
+    -fx-border-color: #444;
+    -fx-border-radius: 2px;
+    -fx-padding: 2;
+}
+
+/* TableView for songs */
+.table-view {
+    -fx-background-color: #222;
+    -fx-control-inner-background: #222;
+    -fx-border-color: #444;
+    -fx-table-cell-border-color: #333;
+    -fx-text-background-color: white;
+}
+
+.table-view .column-header {
+    -fx-background-color: linear-gradient(to bottom, #444, #222);
+    -fx-text-fill: white;
+    -fx-border-color: #555;
+}
+
+.table-view .cell {
+    -fx-background-color: transparent;
+    -fx-text-fill: white;
+}
+
+.table-view .cell:selected {
+    -fx-background-color: #666;
+    -fx-text-fill: black;
+}
+
+/* Highlight selected rows */
+.table-row-cell:selected {
+    -fx-background-color: #555;
+    -fx-text-fill: white;
+}
+
+/* Custom buttons for navigation (Back, Play, Next) */
+#btnBack, #btnPlay, #btnNext {
+    -fx-background-color: linear-gradient(to bottom, #222, #111),
+    linear-gradient(to bottom, #444, #333);
+    -fx-border-color: #555;
+    -fx-text-fill: white;
+    -fx-padding: 5;
+    -fx-background-radius: 5px;
+}
+
+#btnBack:hover, #btnPlay:hover, #btnNext:hover {
+    -fx-background-color: linear-gradient(to bottom, #333, #222),
+    linear-gradient(to bottom, #555, #444);
+    -fx-border-color: #777;
+}
+
+/* Bottom control buttons */
+#btnNewPlayList, #btnNewSong, #btnEditPlayList, #btnEditSong, #btnDeletePlayList, #btnDeleteFromPlaylist, #btnDeleteSong, #btnClose {
+    -fx-background-color: linear-gradient(to bottom, #222, #111),
+    linear-gradient(to bottom, #444, #333);
+    -fx-border-color: #555;
+    -fx-text-fill: white;
+    -fx-padding: 5;
+    -fx-background-radius: 5px;
+}
+
+#btnNewPlayList:hover, #btnNewSong:hover, #btnEditPlayList:hover, #btnEditSong:hover, #btnDeletePlayList:hover, #btnDeleteFromPlaylist:hover, #btnDeleteSong:hover, #btnClose:hover {
+    -fx-background-color: linear-gradient(to bottom, #333, #222),
+    linear-gradient(to bottom, #555, #444);
+    -fx-border-color: #777;
+}
+
+/* Highlight the song currently "Now Playing" */
+#lblPlaying {
+    -fx-text-fill: yellow;
+    -fx-font-weight: bold;
+}
+.popup-vbox {
+    -fx-background-color: gray;
+    -fx-border-color: black;
+    -fx-border-width: 2px;
+    -fx-border-radius: 10px;
+    -fx-background-radius: 10px;
+    -fx-padding: 15px;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.5), 10, 0, 0, 3);
+    -fx-opacity: 1;
+}
+.popup-bg {
+    -fx-background-color: gray;
+    -fx-opacity: 0.15;
+}

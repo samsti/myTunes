@@ -3,83 +3,53 @@ package dk.easv.mytunes.ui;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.geometry.Insets;
-import javafx.scene.control.Button;
-import javafx.scene.control.ChoiceBox;
-import javafx.scene.control.Label;
-import javafx.scene.control.TextField;
-import javafx.scene.layout.AnchorPane;
+import javafx.scene.control.*;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
+import javafx.stage.Stage;
 
 import java.net.URL;
-import java.util.Objects;
 import java.util.ResourceBundle;
 
 public class MainController implements Initializable {
 
 
-    //@FXML
-    //private AnchorPane anchorPopUp;
-    @FXML
-    private StackPane rootPane;
-    @FXML
-    private Button btnNewPlayList;
-    @FXML
-    private Button btnEditPlayList;
-    @FXML
-    private Button btnDeletePlayList;
-    @FXML
-    private Button btnAddSongToPlayList;
-    @FXML
-    private Button btnMoveSongUp;
-    @FXML
-    private Button btnMoveSongDown;
-    @FXML
-    private Button btnDeleteFromPlaylist;
-    @FXML
-    private Button btnNewSong;
-    @FXML
-    private Button btnEditSong;
-    @FXML
-    private Button btnDeleteSong;
-    @FXML
-    private Button btnClose;
-    @FXML
-    private TextField txtNewPlaylist;
-    @FXML
-    private VBox popupVBox;
-    @FXML
-    private VBox popupBg;
-    @FXML
-    private VBox popupNewSong;
-    @FXML
-    private TextField txtSongTitle;
-    @FXML
-    private TextField txtSongArtist;
-    @FXML
-    private ChoiceBox<String> choiceCategory;
-    @FXML
-    private Button btnChooseCategory;
-    @FXML
-    private Button btnAddCategory;
-    @FXML
-    private TextField txtTime;
-    @FXML
-    private TextField txtFilePath;
-    @FXML
-    private Button btnChoose;
-    @FXML
-    private Button btnSaveSong;
-    @FXML
-    private Button btnCancelSong;
-    @FXML
-    private TextField txtNewCategory;
+    @FXML private StackPane rootPane;
+    @FXML private Button btnNewPlayList;
+    @FXML private Button btnEditPlayList;
+    @FXML private Button btnDeletePlayList;
+    @FXML private Button btnAddSongToPlayList;
+    @FXML private Button btnMoveSongUp;
+    @FXML private Button btnMoveSongDown;
+    @FXML private Button btnDeleteFromPlaylist;
+    @FXML private Button btnNewSong;
+    @FXML private Button btnEditSong;
+    @FXML private Button btnDeleteSong;
+    @FXML private Button btnClose;
+    @FXML private TextField txtNewPlaylist;
+    @FXML private VBox popupVBox;
+    @FXML private VBox popupBg;
+    @FXML private VBox popupNewSong;
+    @FXML private TextField txtSongTitle;
+    @FXML private TextField txtSongArtist;
+    @FXML private ChoiceBox<String> choiceCategory;
+    @FXML private Button btnChooseCategory;
+    @FXML private Button btnAddCategory;
+    @FXML private TextField txtTime;
+    @FXML private TextField txtFilePath;
+    @FXML private Button btnChoose;
+    @FXML private Button btnSaveSong;
+    @FXML private Button btnCancelSong;
+    @FXML private TextField txtNewCategory;
+    @FXML private ListView<String> lstPlaylist;
+    @FXML private ListView<String> lstSongsInPlaylist;
+    @FXML private TableView<String> tblSongs;
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         popupBg.setPrefWidth(rootPane.getWidth());
         popupBg.setPrefHeight(rootPane.getHeight());
+
     }
 
 
@@ -88,6 +58,7 @@ public class MainController implements Initializable {
         popupBg.setVisible(true);
         popupVBox.setVisible(true);
         popupVBox.toFront();
+
     }
 
     @FXML
@@ -95,6 +66,7 @@ public class MainController implements Initializable {
         txtNewPlaylist.setText("");
         popupBg.setVisible(false);
         popupVBox.setVisible(false);
+
     }
     @FXML
     private void saveButtonClicked(ActionEvent event) {
@@ -124,5 +96,14 @@ public class MainController implements Initializable {
         txtTime.setText("");
         popupBg.setVisible(false);
         popupNewSong.setVisible(false);
+        txtNewCategory.setVisible(false);
+        btnAddCategory.setVisible(false);
+        btnChooseCategory.setVisible(true);
+    }
+
+    @FXML
+    private void btnCloseClicked(ActionEvent event) {
+        Stage stage = (Stage) btnClose.getScene().getWindow();
+        stage.close();
     }
 }
