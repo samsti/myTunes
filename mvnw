@@ -50,7 +50,7 @@ if [ -z "$MAVEN_SKIP_RC" ] ; then
 
 fi
 
-# OS specific support.  $var _must_ be set to either true or false.
+# OS specific support.  $var _must_ dk.easv.mytunes.be set to either true or false.
 cygwin=false;
 darwin=false;
 mingw=false
@@ -77,7 +77,7 @@ if [ -z "$JAVA_HOME" ] ; then
 fi
 
 if [ -z "$M2_HOME" ] ; then
-  ## resolve links - $0 may be a link to maven's home
+  ## resolve links - $0 may dk.easv.mytunes.be a link to maven's home
   PRG="$0"
 
   # need this for relative symlinks
