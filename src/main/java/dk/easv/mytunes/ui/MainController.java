@@ -60,6 +60,8 @@ public class MainController implements Initializable {
     @FXML
     private ChoiceBox<String> choiceCategory;
     @FXML
+    private Button btnChooseCategory;
+    @FXML
     private Button btnAddCategory;
     @FXML
     private TextField txtTime;
@@ -71,6 +73,8 @@ public class MainController implements Initializable {
     private Button btnSaveSong;
     @FXML
     private Button btnCancelSong;
+    @FXML
+    private TextField txtNewCategory;
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
@@ -104,6 +108,13 @@ public class MainController implements Initializable {
         popupBg.setVisible(true);
         popupNewSong.setVisible(true);
         popupNewSong.toFront();
+    }
+    @FXML
+    private void btnChooseCategoryClicked(ActionEvent event) {
+        btnChoose.setVisible(false);
+        txtNewCategory.setVisible(true);
+        btnChooseCategory.setVisible(false);
+        btnAddCategory.setVisible(true);
     }
     @FXML
     private void btnCancelSongClicked(ActionEvent event) {

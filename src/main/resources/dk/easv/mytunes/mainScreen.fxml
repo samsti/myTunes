@@ -98,13 +98,15 @@
                   <TextField fx:id="txtSongTitle" layoutX="133.0" layoutY="7.0" maxHeight="20.0" prefHeight="20.0" prefWidth="200.0" promptText="Song Title" />
                   <TextField fx:id="txtSongArtist" layoutX="133.0" layoutY="61.0" maxHeight="30.0" prefHeight="30.0" prefWidth="200.0" promptText="Artist" />
                   <ChoiceBox fx:id="choiceCategory" layoutY="120.0" prefWidth="150.0" />
-                  <Button fx:id="btnAddCategory" layoutX="171.0" layoutY="120.0" mnemonicParsing="false" prefWidth="100.0" text="More" />
+                  <Button fx:id="btnChooseCategory" layoutX="171.0" layoutY="120.0" mnemonicParsing="false" onAction="#btnChooseCategoryClicked" prefWidth="100.0" text="More" />
                   <Label layoutY="178.0" text="Time: " />
                   <TextField fx:id="txtTime" layoutX="50.0" layoutY="171.0" maxHeight="30.0" prefHeight="30.0" prefWidth="50.0" promptText="4:23" />
                   <TextField fx:id="txtFilePath" layoutX="-2.0" layoutY="216.0" prefWidth="200.0" />
                   <Button fx:id="btnChoose" layoutX="222.0" layoutY="216.0" mnemonicParsing="false" text="Choose" />
                   <Button fx:id="btnSaveSong" layoutX="391.0" layoutY="261.0" mnemonicParsing="false" text="Save" />
                   <Button fx:id="btnCancelSong" layoutX="307.0" layoutY="261.0" mnemonicParsing="false" onAction="#btnCancelSongClicked" text="Cancel" />
+                  <TextField fx:id="txtNewCategory" layoutX="171.0" layoutY="120.0" promptText="Add new genre" visible="false" />
+                  <Button fx:id="btnAddCategory" layoutX="332.0" layoutY="120.0" mnemonicParsing="false" text="Add" visible="false" />
                </children>
             </AnchorPane>
          </children>
