@@ -8,7 +8,7 @@ public class Song {
     private final IntegerProperty id;
     private final StringProperty title;
     private final StringProperty artist;
-    private final StringProperty duration; // or use StringProperty for simplicity
+    private final StringProperty duration;
     private final StringProperty filePath;
     private final IntegerProperty category;
 
@@ -48,6 +48,11 @@ public class Song {
 
     public int getCategory(){
         return category.get();
+    }
+
+    @Override
+    public String toString() {
+        return getTitle() + " " + getArtist();
     }
 
 }

@@ -31,4 +31,9 @@ public class Playlist {
     public int getNumberOfSongs(){
         return numberOfSongs;
     }
+
+    @Override
+    public String toString() {
+        return name;
+    }
 }

@@ -1,7 +1,9 @@
 package dk.easv.mytunes.ui;
 
+import dk.easv.mytunes.be.Playlist;
 import dk.easv.mytunes.be.Song;
 import dk.easv.mytunes.exceptions.DBException;
+import javafx.collections.FXCollections;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -44,8 +46,8 @@ public class MainController implements Initializable {
     @FXML private Button btnSaveSong;
     @FXML private Button btnCancelSong;
     @FXML private TextField txtNewCategory;
-    @FXML private ListView<String> lstPlaylist;
-    @FXML private ListView<String> lstSongsInPlaylist;
+    @FXML private ListView<Playlist> lstPlaylist;
+    @FXML private ListView<Song> lstSongsInPlaylist;
     @FXML private TableView<Song> tblSongs;
     @FXML private TableColumn<Song, String> titleColumn;
     @FXML private TableColumn<Song, String> artistColumn;
@@ -65,6 +67,20 @@ public class MainController implements Initializable {
         try {
             model.loadSongs();
             tblSongs.setItems(model.getSongs());
+            model.loadPlaylists();
+            lstPlaylist.setItems(model.getPlaylists());
+
+            lstPlaylist.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
+                if (newValue != null) {
+                    try {
+                        model.loadSongsOnPlaylist(newValue.getId());
+                        lstSongsInPlaylist.setItems(model.getSongsOnPlaylist());
+                    } catch (DBException e) {
+                        e.printStackTrace();
+                    }
+                }
+            });
+
         } catch (DBException e) {
             e.printStackTrace();
         }
