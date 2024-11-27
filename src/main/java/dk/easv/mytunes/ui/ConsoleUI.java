@@ -30,10 +30,6 @@ public class ConsoleUI {
         List<Playlist> playlists = dalManager.getAllPlaylists();
         List<Category> categories = dalManager.getAllCategories();
 
-        System.out.println("---- SONGS ----");
-        for(Song song : songs) {
-            System.out.println("ID: " + song.getId() + " - Title: " + song.getTitle() + " - Artist: " + song.getArtist() + " - Duration: " + song.getDuration() + " - Category: " + song.getCategory());
-        }
 
         System.out.println("---- PLAYLISTS ----");
         for(Playlist playlist : playlists) {

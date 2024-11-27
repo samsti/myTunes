@@ -30,10 +30,10 @@
             <ListView fx:id="lstSongsInPlaylist" layoutX="223.0" layoutY="148.0" prefHeight="394.0" prefWidth="200.0" />
             <TableView fx:id="tblSongs" layoutX="457.0" layoutY="148.0" prefHeight="394.0" prefWidth="332.0">
               <columns>
-                <TableColumn prefWidth="105.0" text="Title" />
-                <TableColumn prefWidth="75.0" text="Artist" />
-                  <TableColumn prefWidth="75.0" text="Genre" />
-                  <TableColumn prefWidth="75.0" text="Time" />
+                <TableColumn fx:id="titleColumn" prefWidth="75.0" text="Title" />
+                <TableColumn fx:id="artistColumn" prefWidth="75.0" text="Artist" />
+                  <TableColumn fx:id="durationColumn" prefWidth="75.0" text="Duration" />
+                  <TableColumn fx:id="categoryColumn" prefWidth="75.0" text="Category" />
               </columns>
             </TableView>
             <Button fx:id="btnNewPlayList" layoutX="26.0" layoutY="551.0" mnemonicParsing="false" onAction="#newPlaylistClicked" text="New" />

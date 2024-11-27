@@ -1,9 +1,12 @@
 package dk.easv.mytunes.ui;
 
+import dk.easv.mytunes.be.Song;
+import dk.easv.mytunes.exceptions.DBException;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
+import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
@@ -43,13 +46,28 @@ public class MainController implements Initializable {
     @FXML private TextField txtNewCategory;
     @FXML private ListView<String> lstPlaylist;
     @FXML private ListView<String> lstSongsInPlaylist;
-    @FXML private TableView<String> tblSongs;
+    @FXML private TableView<Song> tblSongs;
+    @FXML private TableColumn<Song, String> titleColumn;
+    @FXML private TableColumn<Song, String> artistColumn;
+    @FXML private TableColumn<Song, String> durationColumn;
+    @FXML private TableColumn<Song, String> categoryColumn;
+    private final MyTunesModel model = new MyTunesModel();
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         popupBg.setPrefWidth(rootPane.getWidth());
         popupBg.setPrefHeight(rootPane.getHeight());
+        titleColumn.setCellValueFactory(cellData -> cellData.getValue().titleProperty());
+        artistColumn.setCellValueFactory(cellData -> cellData.getValue().artistProperty());
+        durationColumn.setCellValueFactory(cellData -> cellData.getValue().durationProperty());
 
+        // Load songs into TableView
+        try {
+            model.loadSongs();
+            tblSongs.setItems(model.getSongs());
+        } catch (DBException e) {
+            e.printStackTrace();
+        }
     }
 
 
