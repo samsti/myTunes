@@ -91,6 +91,29 @@ public class DALManager {
         return categories;
     }
 
-
+    public List<Song> getSongsOnPlaylist(int playlistId) {
+        List<Song> songsOnPlaylist = new ArrayList();
+        try (Connection con = cm.getConnection()) {
+            String sqlcommandSelect = "SELECT s.id, s.title, s.artist, s.duration, s.file_path, s.category FROM songs_in_playlist sip JOIN songs s ON sip.songId = s.id WHERE sip.playlistId = ? ORDER BY sip.[order];";
+            PreparedStatement pstmtSelect = con.prepareStatement(sqlcommandSelect);
+            pstmtSelect.setInt(1, playlistId);
+            ResultSet rs = pstmtSelect.executeQuery();
+            while(rs.next())
+            {
+                songsOnPlaylist.add(new Song(
+                        rs.getInt("id"),
+                        rs.getString("title"),
+                        rs.getString("artist"),
+                        rs.getTime("duration"),
+                        rs.getString("file_path"),
+                        rs.getInt("category"))
+                );
+            }
+        }
+        catch (SQLException ex) {
+            throw new RuntimeException(ex);
+        }
+        return songsOnPlaylist;
+    }
 
 }
