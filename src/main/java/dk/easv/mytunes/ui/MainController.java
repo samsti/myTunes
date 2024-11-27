@@ -16,6 +16,7 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
 import java.net.URL;
+import java.sql.Time;
 import java.util.ResourceBundle;
 
 public class MainController implements Initializable {
@@ -48,7 +49,10 @@ public class MainController implements Initializable {
     @FXML private Button btnSaveSong;
     @FXML private Button btnCancelSong;
     @FXML private TextField txtNewCategory;
-    @FXML private ListView<Playlist> lstPlaylist;
+    @FXML private TableView<Playlist> tblPlaylist;
+    @FXML private TableColumn<Playlist, String> columnName;
+    @FXML private TableColumn<Playlist, Integer> columnItem;
+    @FXML private TableColumn<Playlist, Time> columnTotalDuration;
     @FXML private ListView<Song> lstSongsInPlaylist;
     @FXML private TableView<Song> tblSongs;
     @FXML private TableColumn<Song, String> titleColumn;
@@ -57,23 +61,49 @@ public class MainController implements Initializable {
     @FXML private TableColumn<Song, String> categoryColumn;
     @FXML private Slider volumeSlider;
     private final MyTunesModel model = new MyTunesModel();
+    @FXML private VBox popupDelete;
+    @FXML private Label lblDeleting;
+    @FXML private CheckBox cbDeleteFile;
+    @FXML private Button btncancDelete;
+    @FXML private Button btnYesDelete;
+    private final static int DELETING_PLAYLIST = 0;
+    private final static int DELETING_SONG_FROM_PLAYLIST = 1;
+    private final static int DELETING_SONG = 2;
+    private final static int DELETING_INVALID = -1;
+    private final static String DELETING_DEFAULT_TEXT = "Are you sure you want to delete ";
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         popupBg.setPrefWidth(rootPane.getWidth());
         popupBg.setPrefHeight(rootPane.getHeight());
+        loadSongs();
+
+//        // Adds a listener to any slider changes
+//        volumeSlider.valueProperty().addListener(new ChangeListener<Number>() {
+//            @Override
+//            public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
+//                double volume = newValue.doubleValue();
+//                bllManager.setVolume(volume); //Passes the new volume to the Business Layer
+//            }
+//        });
+    }
+
+    private void loadSongs() {
         titleColumn.setCellValueFactory(cellData -> cellData.getValue().titleProperty());
         artistColumn.setCellValueFactory(cellData -> cellData.getValue().artistProperty());
         durationColumn.setCellValueFactory(cellData -> cellData.getValue().durationProperty());
+        columnName.setCellValueFactory(new PropertyValueFactory<>("name"));
+        columnTotalDuration.setCellValueFactory(new PropertyValueFactory<>("totalDuration"));
+        columnItem.setCellValueFactory(new PropertyValueFactory<>("numberOfSongs"));
 
         // Load songs into TableView
         try {
             model.loadSongs();
             tblSongs.setItems(model.getSongs());
             model.loadPlaylists();
-            lstPlaylist.setItems(model.getPlaylists());
+            tblPlaylist.setItems(model.getPlaylists());
 
-            lstPlaylist.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
+            tblPlaylist.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
                 if (newValue != null) {
                     try {
                         model.loadSongsOnPlaylist(newValue.getId());
@@ -87,18 +117,7 @@ public class MainController implements Initializable {
         } catch (DBException e) {
             e.printStackTrace();
         }
-
-//        // Adds a listener to any slider changes
-//        volumeSlider.valueProperty().addListener(new ChangeListener<Number>() {
-//            @Override
-//            public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
-//                double volume = newValue.doubleValue();
-//                bllManager.setVolume(volume); //Passes the new volume to the Business Layer
-//            }
-//        });
     }
-
-
 
 
     @FXML
@@ -147,6 +166,49 @@ public class MainController implements Initializable {
         txtNewCategory.setVisible(false);
         btnAddCategory.setVisible(false);
         btnChooseCategory.setVisible(true);
+    }
+    @FXML
+    private void btnDeletePlayListClicked (ActionEvent event) {
+        if (tblPlaylist.getSelectionModel().getSelectedItem() != null) {
+            popupBg.setVisible(true);
+            popupDelete.setVisible(true);
+            cbDeleteFile.setVisible(false);
+            Playlist playlistToDelete = tblPlaylist.getSelectionModel().getSelectedItem();
+            lblDeleting.setText(DELETING_DEFAULT_TEXT + playlistToDelete.getName() + " playlist?");
+        }
+    }
+    @FXML
+    private void btnDeleteFromPlaylistClicked(ActionEvent event) {
+        if (lstSongsInPlaylist.getSelectionModel().getSelectedItem() != null) {
+            popupBg.setVisible(true);
+            popupDelete.setVisible(true);
+            cbDeleteFile.setVisible(false);
+            Playlist playlistToDeleteFrom = tblPlaylist.getSelectionModel().getSelectedItem();
+            //SongsInPlaylist songToDelete = lstSongsInPlaylist.getSelectionModel().getSelectedItem();
+            lblDeleting.setText(DELETING_DEFAULT_TEXT
+                    + "\nfrom playlist: " + playlistToDeleteFrom.getName() + "?");
+        }
+    }
+    @FXML
+    private void btnDeleteSongClicked(ActionEvent event) {
+        if (tblSongs.getSelectionModel().getSelectedItem() != null) {
+            popupBg.setVisible(true);
+            popupDelete.setVisible(true);
+            cbDeleteFile.setVisible(true);
+            Song songToDelete = tblSongs.getSelectionModel().getSelectedItem();
+            lblDeleting.setText(DELETING_DEFAULT_TEXT + songToDelete.getTitle() + " song?");
+        }
+    }
+
+    @FXML
+    private void btncancDeleteClicked(ActionEvent event)  {
+        cbDeleteFile.setSelected(false);
+        popupBg.setVisible(false);
+        popupDelete.setVisible(false);
+    }
+    @FXML
+    private void btnYesDeleteClicked(ActionEvent event) {
+        //TODO: delete from database
     }
 
     @FXML

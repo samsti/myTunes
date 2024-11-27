@@ -2,6 +2,7 @@
 
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
+<?import javafx.scene.control.CheckBox?>
 <?import javafx.scene.control.ChoiceBox?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.ListView?>
@@ -26,57 +27,64 @@
             <Label fx:id="lblPlaying" layoutX="360.0" layoutY="88.0" text="Now playing ...." />
             <TextField fx:id="txtFilter" layoutX="582.0" layoutY="84.0" promptText="Filter" />
             <Button fx:id="btnFilter" layoutX="743.0" layoutY="84.0" mnemonicParsing="false" text="Filter" />
-            <ListView fx:id="lstPlaylist" layoutX="14.0" layoutY="148.0" prefHeight="394.0" prefWidth="200.0" />
+            <TableView fx:id="tblPlaylist" layoutX="15.0" layoutY="148.0" prefHeight="394.0" prefWidth="200.0">
+               <columns>
+                  <TableColumn fx:id="columnName" prefWidth="90.0" text="Name" />
+                  <TableColumn fx:id="columnItem" prefWidth="50.0" text="Items" />
+                  <TableColumn fx:id="columnTotalDuration" prefWidth="70.0" text="Duration" />
+               </columns>
+            </TableView>
             <ListView fx:id="lstSongsInPlaylist" layoutX="223.0" layoutY="148.0" prefHeight="394.0" prefWidth="200.0" />
-            <TableView fx:id="tblSongs" layoutX="457.0" layoutY="148.0" prefHeight="394.0" prefWidth="332.0">
+            <TableView fx:id="tblSongs" layoutX="457.0" layoutY="142.0" prefHeight="400.0" prefWidth="332.0">
               <columns>
-                <TableColumn fx:id="titleColumn" prefWidth="75.0" text="Title" />
+                <TableColumn fx:id="titleColumn" prefWidth="105.0" text="Title" />
                 <TableColumn fx:id="artistColumn" prefWidth="75.0" text="Artist" />
+                  <TableColumn fx:id="categoryColumn" prefWidth="75.0" text="Genre" />
                   <TableColumn fx:id="durationColumn" prefWidth="75.0" text="Duration" />
-                  <TableColumn fx:id="categoryColumn" prefWidth="75.0" text="Category" />
               </columns>
             </TableView>
             <Button fx:id="btnNewPlayList" layoutX="26.0" layoutY="551.0" mnemonicParsing="false" onAction="#newPlaylistClicked" text="New" />
             <Button fx:id="btnEditPlayList" layoutX="85.0" layoutY="551.0" mnemonicParsing="false" text="Edit" />
-            <Button fx:id="btnDeletePlayList" layoutX="155.0" layoutY="551.0" mnemonicParsing="false" text="Delete" />
+            <Button fx:id="btnDeletePlayList" layoutX="155.0" layoutY="551.0" mnemonicParsing="false" onAction="#btnDeletePlayListClicked" text="Delete" />
             <Label layoutX="14.0" layoutY="125.0" text="Playlists" />
             <Label layoutX="223.0" layoutY="125.0" text="Songs on Playlist" />
             <Label layoutX="457.0" layoutY="125.0" text="Songs" />
             <Button fx:id="btnAddSongToPlayList" layoutX="426.0" layoutY="148.0" mnemonicParsing="false" text="&lt;-" />
             <Button fx:id="btnMoveSongUp" layoutX="254.0" layoutY="551.0" mnemonicParsing="false" text="▲" />
             <Button fx:id="btnMoveSongDown" layoutX="286.0" layoutY="551.0" mnemonicParsing="false" text="▼" />
-            <Button fx:id="btnDeleteFromPlaylist" layoutX="334.0" layoutY="551.0" mnemonicParsing="false" text="Delete" />
+            <Button fx:id="btnDeleteFromPlaylist" layoutX="334.0" layoutY="551.0" mnemonicParsing="false" onAction="#btnDeleteFromPlaylistClicked" text="Delete" />
             <Button fx:id="btnNewSong" layoutX="464.0" layoutY="551.0" mnemonicParsing="false" onAction="#btnNewSongClicked" text="New" />
             <Button fx:id="btnEditSong" layoutX="519.0" layoutY="551.0" mnemonicParsing="false" text="Edit" />
-            <Button fx:id="btnDeleteSong" layoutX="571.0" layoutY="551.0" mnemonicParsing="false" text="Delete" />
+            <Button fx:id="btnDeleteSong" layoutX="571.0" layoutY="551.0" mnemonicParsing="false" onAction="#btnDeleteSongClicked" text="Delete" />
             <Button fx:id="btnClose" layoutX="706.0" layoutY="551.0" mnemonicParsing="false" onAction="#btnCloseClicked" text="Close" />
          </children>
       </AnchorPane>
       <VBox fx:id="popupBg" prefHeight="600" prefWidth="800" styleClass="popup-bg" visible="false" />
             <VBox fx:id="popupVBox" alignment="CENTER" maxHeight="150" maxWidth="450" prefHeight="150.0" prefWidth="450.0" styleClass="popup-vbox" visible="false">
                <children>
-                  <HBox prefHeight="100.0" prefWidth="200.0">
+            <Label styleClass="popup-title" text="Add/Edit Playlist" />
+                  <HBox alignment="CENTER_LEFT" prefHeight="50.0" prefWidth="200.0">
                      <children>
+                        <TextField fx:id="txtNewPlaylist" prefWidth="200.0" promptText="Name your playlist">
+                           <HBox.margin>
+                              <Insets left="10.0" top="20.0" />
+                           </HBox.margin>
+                        </TextField>
                         <Label text="Name">
                            <HBox.margin>
                               <Insets left="10.0" top="20.0" />
                            </HBox.margin>
                         </Label>
-                        <TextField fx:id="txtNewPlaylist" promptText="Name your playlist">
-                           <HBox.margin>
-                              <Insets left="20.0" top="20.0" />
-                           </HBox.margin>
-                        </TextField>
                      </children>
                   </HBox>
-                  <HBox prefHeight="100.0" prefWidth="200.0">
+                  <HBox alignment="BOTTOM_RIGHT" prefHeight="50.0" prefWidth="200.0">
                      <children>
-                        <Button mnemonicParsing="false" onAction="#cancelButtonClicked" text="Cancel">
+                        <Button mnemonicParsing="false" onAction="#cancelButtonClicked" prefWidth="100.0" text="Cancel">
                            <HBox.margin>
                               <Insets right="20.0" />
                            </HBox.margin>
                         </Button>
-                        <Button mnemonicParsing="false" onAction="#saveButtonClicked" text="Save" />
+                        <Button mnemonicParsing="false" onAction="#saveButtonClicked" prefWidth="100.0" text="Save" textAlignment="RIGHT" />
                      </children>
                      <padding>
                         <Insets left="200.0" />
@@ -86,29 +94,61 @@
             </VBox>
       <VBox fx:id="popupNewSong" maxHeight="400.0" maxWidth="500.0" prefHeight="400.0" prefWidth="500.0" styleClass="popup-vbox" visible="false">
          <children>
-            <AnchorPane prefHeight="300.0" prefWidth="400.0">
+            <AnchorPane prefHeight="400.0" prefWidth="500.0">
                <children>
-                  <Label layoutX="-2.0" layoutY="72.0" text="Artist:" />
-                  <Label layoutX="-2.0" layoutY="-2.0" text="New / Edit song">
+                  <Label layoutX="236.0" layoutY="99.0" text="Artist" />
+                  <Label layoutX="191.0" layoutY="14.0" styleClass="popup-title" text="New / Edit song">
                      <font>
                         <Font name="System Bold" size="12.0" />
                      </font>
                   </Label>
-                  <Label layoutY="26.0" text="Title: " />
-                  <TextField fx:id="txtSongTitle" layoutX="133.0" layoutY="7.0" maxHeight="20.0" prefHeight="20.0" prefWidth="200.0" promptText="Song Title" />
-                  <TextField fx:id="txtSongArtist" layoutX="133.0" layoutY="61.0" maxHeight="30.0" prefHeight="30.0" prefWidth="200.0" promptText="Artist" />
-                  <ChoiceBox fx:id="choiceCategory" layoutY="120.0" prefWidth="150.0" />
-                  <Button fx:id="btnChooseCategory" layoutX="171.0" layoutY="120.0" mnemonicParsing="false" onAction="#btnChooseCategoryClicked" prefWidth="100.0" text="More" />
-                  <Label layoutY="178.0" text="Time: " />
-                  <TextField fx:id="txtTime" layoutX="50.0" layoutY="171.0" maxHeight="30.0" prefHeight="30.0" prefWidth="50.0" promptText="4:23" />
-                  <TextField fx:id="txtFilePath" layoutX="-2.0" layoutY="216.0" prefWidth="200.0" />
-                  <Button fx:id="btnChoose" layoutX="222.0" layoutY="216.0" mnemonicParsing="false" text="Choose" />
-                  <Button fx:id="btnSaveSong" layoutX="391.0" layoutY="261.0" mnemonicParsing="false" text="Save" />
-                  <Button fx:id="btnCancelSong" layoutX="307.0" layoutY="261.0" mnemonicParsing="false" onAction="#btnCancelSongClicked" text="Cancel" />
-                  <TextField fx:id="txtNewCategory" layoutX="171.0" layoutY="120.0" promptText="Add new genre" visible="false" />
-                  <Button fx:id="btnAddCategory" layoutX="332.0" layoutY="120.0" mnemonicParsing="false" text="Add" visible="false" />
+                  <Label layoutX="237.0" layoutY="58.0" text="Title" />
+                  <TextField fx:id="txtSongTitle" layoutX="14.0" layoutY="55.0" maxHeight="0.0" prefHeight="0.0" prefWidth="200.0" promptText="Song Title" />
+                  <TextField fx:id="txtSongArtist" layoutX="14.0" layoutY="96.0" maxHeight="0.0" prefHeight="0.0" prefWidth="200.0" promptText="Artist" />
+                  <ChoiceBox fx:id="choiceCategory" layoutX="15.0" layoutY="171.0" prefWidth="200.0" />
+                  <Button fx:id="btnChooseCategory" layoutX="233.0" layoutY="173.0" mnemonicParsing="false" onAction="#btnChooseCategoryClicked" prefWidth="100.0" text="More" />
+                  <Label layoutX="157.0" layoutY="218.0" text="Time" />
+                  <TextField fx:id="txtTime" layoutX="15.0" layoutY="211.0" maxHeight="30.0" prefHeight="30.0" prefWidth="100.0" promptText="4:23" />
+                  <TextField fx:id="txtFilePath" layoutX="14.0" layoutY="254.0" prefWidth="200.0" />
+                  <Button fx:id="btnChoose" layoutX="235.0" layoutY="252.0" mnemonicParsing="false" prefWidth="100.0" text="Choose" />
+                  <Button fx:id="btnSaveSong" layoutX="233.0" layoutY="327.0" mnemonicParsing="false" prefWidth="100.0" text="Save" />
+                  <Button fx:id="btnCancelSong" layoutX="121.0" layoutY="327.0" mnemonicParsing="false" onAction="#btnCancelSongClicked" prefWidth="100.0" text="Cancel" />
+                  <TextField fx:id="txtNewCategory" layoutX="235.0" layoutY="174.0" prefWidth="200.0" promptText="Add new genre" visible="false" />
+                  <Button fx:id="btnAddCategory" layoutX="233.0" layoutY="206.0" mnemonicParsing="false" prefWidth="100.0" text="Add" visible="false" />
                </children>
             </AnchorPane>
+         </children>
+      </VBox>
+      <VBox fx:id="popupDelete" alignment="TOP_CENTER" maxHeight="150.0" maxWidth="450.0" prefHeight="150.0" prefWidth="450.0" styleClass="popup-vbox" visible="false">
+         <children>
+            <Label styleClass="popup-title" text="Deleting" />
+            <Label fx:id="lblDeleting" text="Are you sure you want to delete">
+               <VBox.margin>
+                  <Insets top="20.0" />
+               </VBox.margin>
+            </Label>
+            <HBox alignment="BOTTOM_RIGHT" prefHeight="50.0" prefWidth="300.0">
+               <VBox.margin>
+                  <Insets top="20.0" />
+               </VBox.margin>
+               <children>
+                  <CheckBox fx:id="cbDeleteFile" mnemonicParsing="false" text="Deleting file as well">
+                     <HBox.margin>
+                        <Insets left="10.0" />
+                     </HBox.margin>
+                  </CheckBox>
+                  <Button fx:id="btncancDelete" mnemonicParsing="false" onAction="#btncancDeleteClicked" prefWidth="100.0" text="Cancel">
+                     <HBox.margin>
+                        <Insets left="100.0" />
+                     </HBox.margin>
+                  </Button>
+                  <Button fx:id="btnYesDelete" mnemonicParsing="false" onAction="#btnYesDeleteClicked" prefWidth="100.0" text="Yes">
+                     <HBox.margin>
+                        <Insets left="10.0" />
+                     </HBox.margin>
+                  </Button>
+               </children>
+            </HBox>
          </children>
       </VBox>
    </children>
