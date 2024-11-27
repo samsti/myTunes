@@ -184,8 +184,8 @@ public class MainController implements Initializable {
             popupDelete.setVisible(true);
             cbDeleteFile.setVisible(false);
             Playlist playlistToDeleteFrom = tblPlaylist.getSelectionModel().getSelectedItem();
-            //SongsInPlaylist songToDelete = lstSongsInPlaylist.getSelectionModel().getSelectedItem();
-            lblDeleting.setText(DELETING_DEFAULT_TEXT
+            Song songToDelete = lstSongsInPlaylist.getSelectionModel().getSelectedItem();
+            lblDeleting.setText(DELETING_DEFAULT_TEXT + songToDelete.getTitle()
                     + "\nfrom playlist: " + playlistToDeleteFrom.getName() + "?");
         }
     }

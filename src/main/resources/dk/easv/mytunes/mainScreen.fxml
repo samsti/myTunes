@@ -127,7 +127,7 @@
                   <Insets top="20.0" />
                </VBox.margin>
             </Label>
-            <HBox alignment="BOTTOM_RIGHT" prefHeight="50.0" prefWidth="300.0">
+            <HBox alignment="BOTTOM_RIGHT" prefHeight="20.0" prefWidth="300.0">
                <VBox.margin>
                   <Insets top="20.0" />
                </VBox.margin>
