@@ -2,10 +2,12 @@ package dk.easv.mytunes.ui;
 
 import dk.easv.mytunes.be.Playlist;
 import dk.easv.mytunes.be.Song;
+import dk.easv.mytunes.bll.BLLManager;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import dk.easv.mytunes.exceptions.DBException;
 import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -15,6 +17,10 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
+import javax.swing.*;
+import javax.swing.table.TableColumnModel;
+import javax.swing.table.TableModel;
+import javax.swing.table.TableRowSorter;
 import java.net.URL;
 import java.sql.Time;
 import java.util.ResourceBundle;
@@ -34,6 +40,7 @@ public class MainController implements Initializable {
     @FXML private Button btnEditSong;
     @FXML private Button btnDeleteSong;
     @FXML private Button btnClose;
+    @FXML private TextField txtFilter;
     @FXML private TextField txtNewPlaylist;
     @FXML private VBox popupVBox;
     @FXML private VBox popupBg;
@@ -215,6 +222,16 @@ public class MainController implements Initializable {
     private void btnCloseClicked(ActionEvent event) {
         Stage stage = (Stage) btnClose.getScene().getWindow();
         stage.close();
+    }
+    @FXML
+    private void searchSongs(ActionEvent event) {
+
+    }
+    @FXML
+    private void btnPlayClicked(ActionEvent event) {
+        BLLManager manager = new BLLManager();
+        manager.playSong(lstSongsInPlaylist.getSelectionModel().getSelectedItem());
+        //manager.playSong(new Song (1, "Silent night", "YT", Time.valueOf("00:02:22"),"C:\\Users\\ervin\\Documents\\School\\SCO1\\Project\\r\\myTunes\\src\\main\\resources\\music\\Silent.mp3",1));
     }
 
 

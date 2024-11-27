@@ -21,12 +21,12 @@
       <AnchorPane prefHeight="600.0" prefWidth="800.0">
          <children>
             <Button fx:id="btnBack" layoutX="15.0" layoutY="58.0" mnemonicParsing="false" text="Back" />
-            <Button fx:id="btnPlay" layoutX="66.0" layoutY="58.0" mnemonicParsing="false" text="Play" />
+            <Button fx:id="btnPlay" layoutX="66.0" layoutY="58.0" mnemonicParsing="false" onAction="#btnPlayClicked" text="Play" />
             <Button fx:id="btnNext" layoutX="114.0" layoutY="58.0" mnemonicParsing="false" text="Next" />
             <Slider fx:id="sldVolume" layoutX="15.0" layoutY="89.0" showTickMarks="true" value="50.0" />
             <Label fx:id="lblPlaying" layoutX="360.0" layoutY="88.0" text="Now playing ...." />
             <TextField fx:id="txtFilter" layoutX="582.0" layoutY="84.0" promptText="Filter" />
-            <Button fx:id="btnFilter" layoutX="743.0" layoutY="84.0" mnemonicParsing="false" text="Filter" />
+            <Button fx:id="btnFilter" layoutX="743.0" layoutY="84.0" mnemonicParsing="false" onAction="#searchSongs" text="Filter" />
             <TableView fx:id="tblPlaylist" layoutX="15.0" layoutY="148.0" prefHeight="394.0" prefWidth="200.0">
                <columns>
                   <TableColumn fx:id="columnName" prefWidth="90.0" text="Name" />
