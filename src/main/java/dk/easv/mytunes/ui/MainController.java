@@ -2,6 +2,8 @@ package dk.easv.mytunes.ui;
 
 import dk.easv.mytunes.be.Playlist;
 import dk.easv.mytunes.be.Song;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import dk.easv.mytunes.exceptions.DBException;
 import javafx.collections.FXCollections;
 import javafx.event.ActionEvent;
@@ -53,6 +55,7 @@ public class MainController implements Initializable {
     @FXML private TableColumn<Song, String> artistColumn;
     @FXML private TableColumn<Song, String> durationColumn;
     @FXML private TableColumn<Song, String> categoryColumn;
+    @FXML private Slider volumeSlider;
     private final MyTunesModel model = new MyTunesModel();
 
     @Override
@@ -84,7 +87,18 @@ public class MainController implements Initializable {
         } catch (DBException e) {
             e.printStackTrace();
         }
+
+//        // Adds a listener to any slider changes
+//        volumeSlider.valueProperty().addListener(new ChangeListener<Number>() {
+//            @Override
+//            public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
+//                double volume = newValue.doubleValue();
+//                bllManager.setVolume(volume); //Passes the new volume to the Business Layer
+//            }
+//        });
     }
+
+
 
 
     @FXML
@@ -140,4 +154,6 @@ public class MainController implements Initializable {
         Stage stage = (Stage) btnClose.getScene().getWindow();
         stage.close();
     }
+
+
 }
