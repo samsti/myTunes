@@ -73,4 +73,8 @@ public class BLLManager {
         ChooseFile fileBrowser = new ChooseFile(window);
         return fileBrowser.getSelectedFilePath();
     }
+
+    public Playlist addPlaylist(Playlist playlist) {
+        return dalManager.createPlaylist(playlist);
+    }
 }

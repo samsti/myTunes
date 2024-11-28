@@ -36,4 +36,9 @@ public class MyTunesModel {
     public ObservableList<Song> getSongsOnPlaylist() {
         return songsOnPlaylist;
     }
+
+    public void createPlaylist(String title) throws DBException {
+        Playlist newPlaylist = manager.addPlaylist(new Playlist(title));
+        playlists.add(newPlaylist);
+    }
 }

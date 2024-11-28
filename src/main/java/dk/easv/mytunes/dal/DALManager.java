@@ -116,4 +116,16 @@ public class DALManager {
         return songsOnPlaylist;
     }
 
+    public Playlist createPlaylist(Playlist playlist) {
+        try (Connection con = cm.getConnection()) {
+            String sqlcommandInsert = "INSERT INTO playlists (name) VALUES (?)";
+            PreparedStatement pstmtSelect = con.prepareStatement(sqlcommandInsert);
+            pstmtSelect.setString(1, playlist.getName());
+            pstmtSelect.execute();
+        }
+        catch (SQLException ex) {
+            throw new RuntimeException(ex);
+        }
+        return playlist;
+    }
 }

@@ -148,11 +148,21 @@ public class MainController implements Initializable {
 
     }
     @FXML
-    private void saveButtonClicked(ActionEvent event) {
+    private void savePlaylistButtonClicked(ActionEvent event) {
+        String playlistName = txtNewPlaylist.getText();
+        Alert a = new Alert(Alert.AlertType.NONE);
+
+        if (!playlistName.isBlank()) {
+            model.createPlaylist(playlistName);
+        } else {
+            a.setAlertType(Alert.AlertType.ERROR);
+            a.setContentText("Please fill in all fields");
+            a.show();
+        }
+
         txtNewPlaylist.setText("");
         popupBg.setVisible(false);
         popupVBox.setVisible(false);
-        //TODO: save to DB
     }
     @FXML
     private void btnNewSongClicked(ActionEvent event) {
