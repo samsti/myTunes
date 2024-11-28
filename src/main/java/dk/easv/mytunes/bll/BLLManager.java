@@ -2,10 +2,12 @@ package dk.easv.mytunes.bll;
 
 import dk.easv.mytunes.be.Playlist;
 import dk.easv.mytunes.be.Song;
+import dk.easv.mytunes.dal.ChooseFile;
 import dk.easv.mytunes.dal.DALManager;
 import dk.easv.mytunes.exceptions.DBException;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
+import javafx.stage.Window;
 
 import java.io.File;
 import java.util.List;
@@ -36,8 +38,8 @@ public class BLLManager {
         Media media = new Media(new File(filePath).toURI().toString());
 
         // Create a MediaPlayer object
-        MediaPlayer mediaPlayer = new MediaPlayer(media);
-
+        mediaPlayer = new MediaPlayer(media);
+        volume = 0.2;
         // Play the song
         mediaPlayer.setVolume(volume);
         mediaPlayer.play();
@@ -57,5 +59,18 @@ public class BLLManager {
     }
     public double getVolume(double v) {
         return volume;
+    }
+
+    public boolean isPlaying() {
+        if (mediaPlayer.getStatus() == MediaPlayer.Status.PLAYING) {
+            System.out.println("playing");
+            return true;
+        }
+        return false;
+    }
+
+    public String openFile(Window window) {
+        ChooseFile fileBrowser = new ChooseFile(window);
+        return fileBrowser.getSelectedFilePath();
     }
 }

@@ -110,7 +110,7 @@
                   <Label layoutX="157.0" layoutY="218.0" text="Time" />
                   <TextField fx:id="txtTime" layoutX="15.0" layoutY="211.0" maxHeight="30.0" prefHeight="30.0" prefWidth="100.0" promptText="4:23" />
                   <TextField fx:id="txtFilePath" layoutX="14.0" layoutY="254.0" prefWidth="200.0" />
-                  <Button fx:id="btnChoose" layoutX="235.0" layoutY="252.0" mnemonicParsing="false" prefWidth="100.0" text="Choose" />
+                  <Button fx:id="btnChoose" layoutX="235.0" layoutY="252.0" mnemonicParsing="false" onAction="#btnChooseClicked" prefWidth="100.0" text="Choose" />
                   <Button fx:id="btnSaveSong" layoutX="233.0" layoutY="327.0" mnemonicParsing="false" prefWidth="100.0" text="Save" />
                   <Button fx:id="btnCancelSong" layoutX="121.0" layoutY="327.0" mnemonicParsing="false" onAction="#btnCancelSongClicked" prefWidth="100.0" text="Cancel" />
                   <TextField fx:id="txtNewCategory" layoutX="235.0" layoutY="174.0" prefWidth="200.0" promptText="Add new genre" visible="false" />

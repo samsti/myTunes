@@ -3,6 +3,7 @@ package dk.easv.mytunes.ui;
 import dk.easv.mytunes.be.Playlist;
 import dk.easv.mytunes.be.Song;
 import dk.easv.mytunes.bll.BLLManager;
+import dk.easv.mytunes.dal.ChooseFile;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import dk.easv.mytunes.exceptions.DBException;
@@ -15,6 +16,7 @@ import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
+import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 
 import javax.swing.*;
@@ -29,6 +31,7 @@ public class MainController implements Initializable {
 
 
     @FXML private StackPane rootPane;
+    @FXML private Button btnPlay;
     @FXML private Button btnNewPlayList;
     @FXML private Button btnEditPlayList;
     @FXML private Button btnDeletePlayList;
@@ -234,5 +237,16 @@ public class MainController implements Initializable {
         BLLManager manager = new BLLManager();
         //manager.playSong(lstSongsInPlaylist.getSelectionModel().getSelectedItem());
         manager.playSong(new Song (1, "Silent night", "YT", Time.valueOf("00:02:22"),"C:\\Users\\ervin\\Documents\\School\\SCO1\\Project\\r\\myTunes\\src\\main\\resources\\music\\Silent.mp3",1));
+        if (manager.isPlaying())
+            btnPlay.setText("Pause");
+        else
+            btnPlay.setText("Play");
+    }
+    @FXML
+    private void btnChooseClicked(ActionEvent event) {
+        BLLManager manager = new BLLManager();
+        String filepath =  manager.openFile(btnChoose.getScene().getWindow());
+        txtFilePath.setText(filepath);
+
     }
 }
