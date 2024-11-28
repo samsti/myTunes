@@ -190,17 +190,20 @@ public class DALManager {
     }
     public void moveSongUp(Song song, int playlistId, boolean up) {
         try (Connection con = cm.getConnection()) {
-            int newOrder = up ? song.getOrder()-1: song.getOrder()+1;
+            int newOrder = 0;
             int swappingId = 0;
             
-            //Gets the id of the song where it needs to swap
-            String sqlcommand = "SELECT * FROM songs_in_playlist WHERE playlistId = ? AND [order] = ?";
+            //Gets the id of the song where it needs to swap checking the next or the previous order
+            String sqlcommand = "SELECT * FROM songs_in_playlist WHERE playlistId = ? AND [order] " +
+                    (up? "< ":"> ") + "? ORDER BY [order] " +
+                    (up? "DESC OFFSET 0 ROWS FETCH NEXT 1 ROW ONLY":"ASC OFFSET 0 ROWS FETCH NEXT 1 ROW ONLY");
             PreparedStatement statement = con.prepareStatement(sqlcommand);
             statement.setInt(1, playlistId);
-            statement.setInt(2, newOrder);
+            statement.setInt(2, song.getOrder());
             ResultSet rs = statement.executeQuery();
             while(rs.next()) {
                 swappingId = rs.getInt("id");
+                newOrder = rs.getInt("order");
             }
                         
             //Update the song which is getting moved
