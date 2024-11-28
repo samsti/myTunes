@@ -83,6 +83,21 @@
     -fx-text-fill: white;
 }
 
+/* Choice box for categories */
+.choice-box {
+    -fx-background-color: #222;
+    -fx-text-fill: white;
+    -fx-border-color: #444;
+    -fx-border-radius: 2;
+    -fx-padding: 2;
+}
+.choice-box .context-menu {
+    -fx-background-color: #222;
+    -fx-text-fill: white;
+    -fx-border-color: #444;
+    -fx-border-radius: 2;
+}
+
 /* Custom buttons for navigation (Back, Play, Next) */
 #btnBack, #btnPlay, #btnNext {
     -fx-background-color: linear-gradient(to bottom, #222, #111),

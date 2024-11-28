@@ -1,11 +1,15 @@
 package dk.easv.mytunes.ui;
 
+import dk.easv.mytunes.be.Category;
 import dk.easv.mytunes.be.Playlist;
 import dk.easv.mytunes.be.Song;
 import dk.easv.mytunes.bll.BLLManager;
 import dk.easv.mytunes.exceptions.DBException;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class MyTunesModel {
     private final BLLManager manager = new BLLManager();
@@ -35,5 +39,9 @@ public class MyTunesModel {
 
     public ObservableList<Song> getSongsOnPlaylist() {
         return songsOnPlaylist;
+    }
+
+    public List<Category> getCategories() {
+        return manager.getAllCategories();
     }
 }

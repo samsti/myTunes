@@ -37,22 +37,43 @@ public class Song {
         return title.get();
     }
 
+    public void setTitle(String title){
+        this.title.set(title);
+    }
+
     public String getArtist(){
         return artist.get();
     }
 
+    public void setArtist(String artist){
+        this.artist.set(artist);
+    }
+
+    public String getDuration(){ return duration.get(); }
+
+    public void setDuration(String duration){
+        this.duration.set(duration);
+    }
 
     public String getFilePath(){
         return filePath.get();
+    }
+
+    public void setFilePath(String filePath){
+        this.filePath.set(filePath);
     }
 
     public int getCategory(){
         return category.get();
     }
 
+    public void setCategory(int category){
+        this.category.set(category);
+    }
+
     @Override
     public String toString() {
-        return getTitle() + " " + getArtist();
+        return getTitle() + " " + getArtist() + " " + getDuration() + " " + getFilePath();
     }
 
 }

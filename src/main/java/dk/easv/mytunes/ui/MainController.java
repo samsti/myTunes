@@ -1,5 +1,6 @@
 package dk.easv.mytunes.ui;
 
+import dk.easv.mytunes.be.Category;
 import dk.easv.mytunes.be.Playlist;
 import dk.easv.mytunes.be.Song;
 import dk.easv.mytunes.bll.BLLManager;
@@ -50,7 +51,7 @@ public class MainController implements Initializable {
     @FXML private VBox popupNewSong;
     @FXML private TextField txtSongTitle;
     @FXML private TextField txtSongArtist;
-    @FXML private ChoiceBox<String> choiceCategory;
+    @FXML private ChoiceBox<Category> choiceCategory;
     @FXML private Button btnChooseCategory;
     @FXML private Button btnAddCategory;
     @FXML private TextField txtTime;
@@ -82,9 +83,12 @@ public class MainController implements Initializable {
     private final static int DELETING_SONG = 2;
     private final static int DELETING_INVALID = -1;
     private final static String DELETING_DEFAULT_TEXT = "Are you sure you want to delete ";
+    private BLLManager manager;
+
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
+        manager = new BLLManager();
         popupBg.setPrefWidth(rootPane.getWidth());
         popupBg.setPrefHeight(rootPane.getHeight());
         loadSongs();
@@ -94,8 +98,7 @@ public class MainController implements Initializable {
             @Override
             public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
                 double volume = newValue.doubleValue();
-                BLLManager bllManager = new BLLManager();
-                bllManager.setVolume(volume/100); //Passes the new volume to the Business Layer
+                manager.setVolume(volume/100); //Passes the new volume to the Business Layer
             }
         });
     }
@@ -134,57 +137,44 @@ public class MainController implements Initializable {
 
     @FXML
     private void newPlaylistClicked(ActionEvent event) {
-        popupBg.setVisible(true);
-        popupVBox.setVisible(true);
-        popupVBox.toFront();
+        openPlaylistPopUp();
 
     }
 
     @FXML
     private void cancelButtonClicked(ActionEvent event) {
-        txtNewPlaylist.setText("");
-        popupBg.setVisible(false);
-        popupVBox.setVisible(false);
+        closePlaylistPopUp();
 
     }
     @FXML
     private void saveButtonClicked(ActionEvent event) {
-        txtNewPlaylist.setText("");
-        popupBg.setVisible(false);
-        popupVBox.setVisible(false);
-        //TODO: save to DB
+        Playlist editPlaylist = tblPlaylist.getSelectionModel().getSelectedItem();
+        editPlaylist.setName(txtNewPlaylist.getText().trim());
+        if (manager.editPlaylistName(editPlaylist)) {
+            tblPlaylist.getSelectionModel().getSelectedItem().setName(txtNewPlaylist.getText().trim());
+            tblPlaylist.refresh();
+        }
+        closePlaylistPopUp();
     }
     @FXML
     private void btnNewSongClicked(ActionEvent event) {
-        popupBg.setVisible(true);
-        popupNewSong.setVisible(true);
-        popupNewSong.toFront();
+        openSongsPopUp();
     }
     @FXML
     private void btnChooseCategoryClicked(ActionEvent event) {
         btnChoose.setVisible(false);
         txtNewCategory.setVisible(true);
-        btnChooseCategory.setVisible(false);
+        btnChoose.setVisible(false);
         btnAddCategory.setVisible(true);
     }
     @FXML
     private void btnCancelSongClicked(ActionEvent event) {
-        txtFilePath.setText("");
-        txtSongTitle.setText("");
-        txtSongArtist.setText("");
-        txtTime.setText("");
-        popupBg.setVisible(false);
-        popupNewSong.setVisible(false);
-        txtNewCategory.setVisible(false);
-        btnAddCategory.setVisible(false);
-        btnChooseCategory.setVisible(true);
+        closeSongsPopUp();
     }
     @FXML
     private void btnDeletePlayListClicked (ActionEvent event) {
         if (tblPlaylist.getSelectionModel().getSelectedItem() != null) {
-            popupBg.setVisible(true);
-            popupDelete.setVisible(true);
-            cbDeleteFile.setVisible(false);
+            openDeleteWindow();
             Playlist playlistToDelete = tblPlaylist.getSelectionModel().getSelectedItem();
             lblDeleting.setText(DELETING_DEFAULT_TEXT + playlistToDelete.getName() + " playlist?");
         }
@@ -192,9 +182,7 @@ public class MainController implements Initializable {
     @FXML
     private void btnDeleteFromPlaylistClicked(ActionEvent event) {
         if (lstSongsInPlaylist.getSelectionModel().getSelectedItem() != null) {
-            popupBg.setVisible(true);
-            popupDelete.setVisible(true);
-            cbDeleteFile.setVisible(false);
+            openDeleteWindow();
             Playlist playlistToDeleteFrom = tblPlaylist.getSelectionModel().getSelectedItem();
             Song songToDelete = lstSongsInPlaylist.getSelectionModel().getSelectedItem();
             lblDeleting.setText(DELETING_DEFAULT_TEXT + songToDelete.getTitle()
@@ -204,8 +192,7 @@ public class MainController implements Initializable {
     @FXML
     private void btnDeleteSongClicked(ActionEvent event) {
         if (tblSongs.getSelectionModel().getSelectedItem() != null) {
-            popupBg.setVisible(true);
-            popupDelete.setVisible(true);
+            openDeleteWindow();
             cbDeleteFile.setVisible(true);
             Song songToDelete = tblSongs.getSelectionModel().getSelectedItem();
             lblDeleting.setText(DELETING_DEFAULT_TEXT + songToDelete.getTitle() + " song?");
@@ -214,13 +201,12 @@ public class MainController implements Initializable {
 
     @FXML
     private void btncancDeleteClicked(ActionEvent event)  {
-        cbDeleteFile.setSelected(false);
-        popupBg.setVisible(false);
-        popupDelete.setVisible(false);
+        closeDeleteWindow();
     }
     @FXML
     private void btnYesDeleteClicked(ActionEvent event) {
         //TODO: delete from database
+        closeDeleteWindow();
     }
 
     @FXML
@@ -234,7 +220,6 @@ public class MainController implements Initializable {
     }
     @FXML
     private void btnPlayClicked(ActionEvent event) {
-        BLLManager manager = new BLLManager();
         //manager.playSong(lstSongsInPlaylist.getSelectionModel().getSelectedItem());
         manager.playSong(new Song (1, "Silent night", "YT", Time.valueOf("00:02:22"),"C:\\Users\\ervin\\Documents\\School\\SCO1\\Project\\r\\myTunes\\src\\main\\resources\\music\\Silent.mp3",1));
         if (manager.isPlaying())
@@ -244,9 +229,91 @@ public class MainController implements Initializable {
     }
     @FXML
     private void btnChooseClicked(ActionEvent event) {
-        BLLManager manager = new BLLManager();
         String filepath =  manager.openFile(btnChoose.getScene().getWindow());
         txtFilePath.setText(filepath);
+    }
 
+    @FXML
+    private void btnEditPlayListClicked(ActionEvent event) {
+        Playlist playlistToEdit = tblPlaylist.getSelectionModel().getSelectedItem();
+        if (playlistToEdit != null) {
+            openPlaylistPopUp();
+            txtNewPlaylist.setText(playlistToEdit.getName());
+        }
+    }
+    @FXML
+    private void btnEditSongClicked(ActionEvent event) {
+        Song songToEdit = tblSongs.getSelectionModel().getSelectedItem();
+        System.out.println(songToEdit);
+        if (songToEdit != null) {
+            openSongsPopUp();
+            txtSongTitle.setText(songToEdit.getTitle());
+            txtSongArtist.setText(songToEdit.getArtist());
+            txtFilePath.setText(songToEdit.getFilePath());
+            txtTime.setText(songToEdit.getDuration());
+            choiceCategory.setValue(manager.returnCategoryName(songToEdit.getCategory()));
+        }
+    }
+    @FXML
+    private void btnSaveSongClicked(ActionEvent event) {
+        Song songToEdit = tblSongs.getSelectionModel().getSelectedItem();
+        if (songToEdit != null) {
+            songToEdit.setTitle(txtSongTitle.getText().trim());
+            songToEdit.setArtist(txtSongArtist.getText().trim());
+            songToEdit.setFilePath(txtFilePath.getText().trim());
+            songToEdit.setDuration(txtTime.getText().trim());
+            songToEdit.setCategory(choiceCategory.getSelectionModel().getSelectedItem().getId());
+            if (manager.editSong(songToEdit))
+                closeSongsPopUp();
+        }
+        else
+            throw new RuntimeException("No song selected");
+    }
+
+
+    /**
+     *
+     *   Opening and closing the popup windows
+     *
+     */
+    private void openPlaylistPopUp() {
+        popupBg.setVisible(true);
+        popupVBox.setVisible(true);
+        txtNewPlaylist.setText("");
+    }
+
+    private void closePlaylistPopUp() {
+        popupBg.setVisible(false);
+        popupVBox.setVisible(false);
+    }
+    private void openSongsPopUp() {
+        popupBg.setVisible(true);
+        popupNewSong.setVisible(true);
+        popupNewSong.toFront();
+        txtFilePath.setText("");
+        txtSongTitle.setText("");
+        txtSongArtist.setText("");
+        txtTime.setText("");
+        ObservableList<Category> categories = FXCollections.observableArrayList();
+        categories.addAll(model.getCategories());
+        choiceCategory.setItems(categories);
+    }
+    private void closeSongsPopUp() {
+
+        popupBg.setVisible(false);
+        popupNewSong.setVisible(false);
+        txtNewCategory.setVisible(false);
+        btnAddCategory.setVisible(false);
+        btnChooseCategory.setVisible(true);
+    }
+    private void openDeleteWindow() {
+        popupBg.setVisible(true);
+        popupDelete.setVisible(true);
+        cbDeleteFile.setVisible(false);
+    }
+    private void closeDeleteWindow() {
+        cbDeleteFile.setSelected(false);
+        popupBg.setVisible(false);
+        popupDelete.setVisible(false);
     }
 }

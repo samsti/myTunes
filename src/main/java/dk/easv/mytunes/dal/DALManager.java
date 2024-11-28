@@ -91,6 +91,25 @@ public class DALManager {
         return categories;
     }
 
+    public Category getOneCategory (int id) {
+        try (Connection con = cm.getConnection()) {
+            Category category;
+            String sqlcommandSelect = "SELECT * FROM category where id = ?";
+            PreparedStatement pstmtSelect = con.prepareStatement(sqlcommandSelect);
+            pstmtSelect.setInt(1, id);
+            ResultSet rs = pstmtSelect.executeQuery();
+            while(rs.next())
+            {
+                category = new Category(rs.getInt("id"), rs.getString("category"));
+                return category;
+            }
+        }
+        catch (SQLException ex) {
+            throw new RuntimeException(ex);
+        }
+        throw new RuntimeException("No Category found with id " + id);
+    }
+
     public List<Song> getSongsOnPlaylist(int playlistId) {
         List<Song> songsOnPlaylist = new ArrayList();
         try (Connection con = cm.getConnection()) {
@@ -116,4 +135,33 @@ public class DALManager {
         return songsOnPlaylist;
     }
 
+    public boolean editPlaylistName (Playlist playlist) {
+        try (Connection con = cm.getConnection()) {
+            String sqlcommand = "UPDATE playlists SET name = ? WHERE id = ?";
+            PreparedStatement statement = con.prepareStatement(sqlcommand);
+            statement.setString(1, playlist.getName());
+            statement.setInt(2, playlist.getId());
+            statement.executeUpdate();
+            return true;
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public boolean editSong(Song song) {
+        try (Connection con = cm.getConnection()) {
+            String sqlcommand = "UPDATE songs SET title = ?, artist = ?, duration = ?, file_path = ?, category = ? WHERE id = ?";
+            PreparedStatement statement = con.prepareStatement(sqlcommand);
+            statement.setString(1, song.getTitle());
+            statement.setString(2, song.getArtist());
+            statement.setString(3, song.getDuration());
+            statement.setString(4, song.getFilePath());
+            statement.setInt(5, song.getCategory());
+            statement.setInt(6, song.getId());
+            statement.executeUpdate();
+            return true;
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
 }

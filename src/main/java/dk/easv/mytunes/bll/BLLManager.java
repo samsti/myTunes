@@ -1,10 +1,13 @@
 package dk.easv.mytunes.bll;
 
+import dk.easv.mytunes.be.Category;
 import dk.easv.mytunes.be.Playlist;
 import dk.easv.mytunes.be.Song;
 import dk.easv.mytunes.dal.ChooseFile;
 import dk.easv.mytunes.dal.DALManager;
 import dk.easv.mytunes.exceptions.DBException;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
 import javafx.stage.Window;
@@ -72,5 +75,17 @@ public class BLLManager {
     public String openFile(Window window) {
         ChooseFile fileBrowser = new ChooseFile(window);
         return fileBrowser.getSelectedFilePath();
+    }
+    public boolean editPlaylistName(Playlist playlist) {
+        return dalManager.editPlaylistName(playlist);
+    }
+    public boolean editSong(Song song) {
+        return dalManager.editSong(song);
+    }
+    public Category returnCategoryName(int id) {
+        return dalManager.getOneCategory(id);
+    }
+    public List<Category> getAllCategories() {
+        return dalManager.getAllCategories();
     }
 }
