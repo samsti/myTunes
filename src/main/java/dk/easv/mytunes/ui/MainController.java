@@ -51,7 +51,7 @@ public class MainController implements Initializable {
     @FXML private VBox popupNewSong;
     @FXML private TextField txtSongTitle;
     @FXML private TextField txtSongArtist;
-    @FXML private ChoiceBox<String> choiceCategory;
+    @FXML private ChoiceBox<Category> choiceCategory;
     @FXML private Button btnChooseCategory;
     @FXML private Button btnAddCategory;
     @FXML private TextField txtTime;
@@ -78,6 +78,7 @@ public class MainController implements Initializable {
     @FXML private Button btncancDelete;
     @FXML private Button btnYesDelete;
     @FXML private Slider sldVolume;
+    @FXML private Button btnSavePlaylist;
     private final static int DELETING_PLAYLIST = 0;
     private final static int DELETING_SONG_FROM_PLAYLIST = 1;
     private final static int DELETING_SONG = 2;
@@ -138,7 +139,7 @@ public class MainController implements Initializable {
     @FXML
     private void newPlaylistClicked(ActionEvent event) {
         openPlaylistPopUp();
-
+        btnSavePlaylist.setOnAction(e -> savePlaylistButtonClicked(event));
     }
 
     @FXML
@@ -155,6 +156,8 @@ public class MainController implements Initializable {
             tblPlaylist.refresh();
         }
         closePlaylistPopUp();
+    }
+    @FXML
     private void savePlaylistButtonClicked(ActionEvent event) {
         String playlistName = txtNewPlaylist.getText();
         Alert a = new Alert(Alert.AlertType.NONE);
@@ -174,6 +177,7 @@ public class MainController implements Initializable {
     @FXML
     private void btnNewSongClicked(ActionEvent event) {
         openSongsPopUp();
+        btnSaveSong.setOnAction(e -> btnSaveSongClicked(event));
     }
     @FXML
     private void btnChooseCategoryClicked(ActionEvent event) {
@@ -261,6 +265,7 @@ public class MainController implements Initializable {
         Playlist playlistToEdit = tblPlaylist.getSelectionModel().getSelectedItem();
         if (playlistToEdit != null) {
             openPlaylistPopUp();
+            btnSavePlaylist.setOnAction(e -> saveButtonClicked(event));
             txtNewPlaylist.setText(playlistToEdit.getName());
         }
     }
@@ -270,6 +275,8 @@ public class MainController implements Initializable {
         System.out.println(songToEdit);
         if (songToEdit != null) {
             openSongsPopUp();
+            btnSaveSong.setOnAction(e -> btnSaveSongClickedEdit(event));
+
             txtSongTitle.setText(songToEdit.getTitle());
             txtSongArtist.setText(songToEdit.getArtist());
             txtFilePath.setText(songToEdit.getFilePath());
@@ -279,6 +286,21 @@ public class MainController implements Initializable {
     }
     @FXML
     private void btnSaveSongClicked(ActionEvent event) {
+        Song songToEdit = tblSongs.getSelectionModel().getSelectedItem();
+        if (songToEdit != null) {
+            songToEdit.setTitle(txtSongTitle.getText().trim());
+            songToEdit.setArtist(txtSongArtist.getText().trim());
+            songToEdit.setFilePath(txtFilePath.getText().trim());
+            songToEdit.setDuration(txtTime.getText().trim());
+            songToEdit.setCategory(choiceCategory.getSelectionModel().getSelectedItem().getId());
+            if (manager.editSong(songToEdit))
+                closeSongsPopUp();
+        }
+        else
+            throw new RuntimeException("No song selected");
+    }
+    @FXML
+    private void btnSaveSongClickedEdit(ActionEvent event) {
         Song songToEdit = tblSongs.getSelectionModel().getSelectedItem();
         if (songToEdit != null) {
             songToEdit.setTitle(txtSongTitle.getText().trim());

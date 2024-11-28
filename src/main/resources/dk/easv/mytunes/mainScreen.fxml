@@ -60,7 +60,7 @@
          </children>
       </AnchorPane>
       <VBox fx:id="popupBg" prefHeight="600" prefWidth="800" styleClass="popup-bg" visible="false" />
-            <VBox fx:id="popupVBox" alignment="CENTER" maxHeight="150" maxWidth="450" prefHeight="150.0" prefWidth="450.0" styleClass="popup-vbox" visible="false">
+            <VBox fx:id="popupVBox" alignment="CENTER" maxHeight="150" maxWidth="450" prefHeight="150.0" prefWidth="450.0" styleClass="popup-vbox">
                <children>
             <Label fx:id="lblPlaylistPopupTitle" styleClass="popup-title" text="Add/Edit Playlist" />
                   <HBox alignment="CENTER_LEFT" prefHeight="50.0" prefWidth="200.0">
@@ -84,7 +84,7 @@
                               <Insets right="20.0" />
                            </HBox.margin>
                         </Button>
-                        <Button mnemonicParsing="false" onAction="#savePlaylistButtonClicked" prefWidth="100.0" text="Save" textAlignment="RIGHT" />
+                        <Button fx:id="btnSavePlaylist" mnemonicParsing="false" onAction="#savePlaylistButtonClicked" prefWidth="100.0" text="Save" textAlignment="RIGHT" />
                      </children>
                      <padding>
                         <Insets left="200.0" />
