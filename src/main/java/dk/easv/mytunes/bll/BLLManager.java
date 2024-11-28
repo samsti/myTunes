@@ -77,4 +77,8 @@ public class BLLManager {
     public Playlist addPlaylist(Playlist playlist) {
         return dalManager.createPlaylist(playlist);
     }
+
+    public void deletePlaylist(Playlist playlist) {
+        dalManager.deletePlaylist(playlist);
+    }
 }

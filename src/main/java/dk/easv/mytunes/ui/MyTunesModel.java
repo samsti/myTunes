@@ -41,4 +41,9 @@ public class MyTunesModel {
         Playlist newPlaylist = manager.addPlaylist(new Playlist(title));
         playlists.add(newPlaylist);
     }
+
+    public void deletePlaylist(Playlist playlist) throws DBException {
+        manager.deletePlaylist(playlist);
+        playlists.remove(playlist);
+    }
 }

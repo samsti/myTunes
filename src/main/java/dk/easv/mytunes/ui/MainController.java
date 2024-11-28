@@ -191,11 +191,11 @@ public class MainController implements Initializable {
     }
     @FXML
     private void btnDeletePlayListClicked (ActionEvent event) {
-        if (tblPlaylist.getSelectionModel().getSelectedItem() != null) {
+        if (getSelectedPlaylist() != null) {
             popupBg.setVisible(true);
             popupDelete.setVisible(true);
             cbDeleteFile.setVisible(false);
-            Playlist playlistToDelete = tblPlaylist.getSelectionModel().getSelectedItem();
+            Playlist playlistToDelete = getSelectedPlaylist();
             lblDeleting.setText(DELETING_DEFAULT_TEXT + playlistToDelete.getName() + " playlist?");
         }
     }
@@ -228,9 +228,16 @@ public class MainController implements Initializable {
         popupBg.setVisible(false);
         popupDelete.setVisible(false);
     }
+
+    private Playlist getSelectedPlaylist() {
+        return tblPlaylist.getSelectionModel().getSelectedItem();
+    }
+
     @FXML
     private void btnYesDeleteClicked(ActionEvent event) {
-        //TODO: delete from database
+        model.deletePlaylist(getSelectedPlaylist());
+        popupBg.setVisible(false);
+        popupDelete.setVisible(false);
     }
 
     @FXML
