@@ -128,4 +128,16 @@ public class DALManager {
         }
         return playlist;
     }
+
+    public void deletePlaylist(Playlist playlist) {
+        try (Connection con = cm.getConnection()) {
+            String sqlcommandInsert = "DELETE FROM playlists WHERE id = ?";
+            PreparedStatement pstmtSelect = con.prepareStatement(sqlcommandInsert);
+            pstmtSelect.setInt(1, playlist.getId());
+            pstmtSelect.execute();
+        }
+        catch (SQLException ex) {
+            throw new RuntimeException(ex);
+        }
+    }
 }
