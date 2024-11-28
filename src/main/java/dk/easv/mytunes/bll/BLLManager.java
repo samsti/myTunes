@@ -94,4 +94,10 @@ public class BLLManager {
     public void deletePlaylist(Playlist playlist) {
         dalManager.deletePlaylist(playlist);
     }
+    public void moveSongUp(Song song, int playlist, boolean up) {
+            dalManager.moveSongUp(song, playlist, up);
+    }
+    public int numberOfSongsInList(int playlistId) {
+        return dalManager.getNumberOfSongsInList(playlistId);
+    }
 }
