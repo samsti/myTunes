@@ -84,7 +84,7 @@
                               <Insets right="20.0" />
                            </HBox.margin>
                         </Button>
-                        <Button mnemonicParsing="false" onAction="#saveButtonClicked" prefWidth="100.0" text="Save" textAlignment="RIGHT" />
+                        <Button mnemonicParsing="false" onAction="#savePlaylistButtonClicked" prefWidth="100.0" text="Save" textAlignment="RIGHT" />
                      </children>
                      <padding>
                         <Insets left="200.0" />
