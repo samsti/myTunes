@@ -51,7 +51,7 @@ public class MainController implements Initializable {
     @FXML private VBox popupNewSong;
     @FXML private TextField txtSongTitle;
     @FXML private TextField txtSongArtist;
-    @FXML private ChoiceBox<Category> choiceCategory;
+    @FXML private ChoiceBox<String> choiceCategory;
     @FXML private Button btnChooseCategory;
     @FXML private Button btnAddCategory;
     @FXML private TextField txtTime;
@@ -155,6 +155,21 @@ public class MainController implements Initializable {
             tblPlaylist.refresh();
         }
         closePlaylistPopUp();
+    private void savePlaylistButtonClicked(ActionEvent event) {
+        String playlistName = txtNewPlaylist.getText();
+        Alert a = new Alert(Alert.AlertType.NONE);
+
+        if (!playlistName.isBlank()) {
+            model.createPlaylist(playlistName);
+        } else {
+            a.setAlertType(Alert.AlertType.ERROR);
+            a.setContentText("Please fill in all fields");
+            a.show();
+        }
+
+        txtNewPlaylist.setText("");
+        popupBg.setVisible(false);
+        popupVBox.setVisible(false);
     }
     @FXML
     private void btnNewSongClicked(ActionEvent event) {
@@ -203,10 +218,16 @@ public class MainController implements Initializable {
     private void btncancDeleteClicked(ActionEvent event)  {
         closeDeleteWindow();
     }
+
+    private Playlist getSelectedPlaylist() {
+        return tblPlaylist.getSelectionModel().getSelectedItem();
+    }
+
     @FXML
     private void btnYesDeleteClicked(ActionEvent event) {
-        //TODO: delete from database
-        closeDeleteWindow();
+        model.deletePlaylist(getSelectedPlaylist());
+        popupBg.setVisible(false);
+        popupDelete.setVisible(false);
     }
 
     @FXML
@@ -220,6 +241,7 @@ public class MainController implements Initializable {
     }
     @FXML
     private void btnPlayClicked(ActionEvent event) {
+        BLLManager manager = new BLLManager();
         //manager.playSong(lstSongsInPlaylist.getSelectionModel().getSelectedItem());
         manager.playSong(new Song (1, "Silent night", "YT", Time.valueOf("00:02:22"),"C:\\Users\\ervin\\Documents\\School\\SCO1\\Project\\r\\myTunes\\src\\main\\resources\\music\\Silent.mp3",1));
         if (manager.isPlaying())
@@ -229,6 +251,7 @@ public class MainController implements Initializable {
     }
     @FXML
     private void btnChooseClicked(ActionEvent event) {
+        BLLManager manager = new BLLManager();
         String filepath =  manager.openFile(btnChoose.getScene().getWindow());
         txtFilePath.setText(filepath);
     }

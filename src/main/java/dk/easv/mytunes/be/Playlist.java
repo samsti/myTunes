@@ -16,6 +16,10 @@ public class Playlist {
         this.numberOfSongs = numberOfSongs;
     }
 
+    public Playlist(String name){
+        this.name = name;
+    }
+
     public int getId(){
         return id;
     }
@@ -38,6 +42,6 @@ public class Playlist {
 
     @Override
     public String toString() {
-        return name;
+        return id + " " + name;
     }
 }

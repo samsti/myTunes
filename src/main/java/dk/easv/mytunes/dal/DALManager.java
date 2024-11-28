@@ -5,7 +5,6 @@ import dk.easv.mytunes.be.Playlist;
 import dk.easv.mytunes.be.Song;
 import dk.easv.mytunes.exceptions.DBException;
 
-import java.io.IOException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -135,6 +134,30 @@ public class DALManager {
         return songsOnPlaylist;
     }
 
+    public Playlist createPlaylist(Playlist playlist) {
+        try (Connection con = cm.getConnection()) {
+            String sqlcommandInsert = "INSERT INTO playlists (name) VALUES (?)";
+            PreparedStatement pstmtSelect = con.prepareStatement(sqlcommandInsert);
+            pstmtSelect.setString(1, playlist.getName());
+            pstmtSelect.execute();
+        }
+        catch (SQLException ex) {
+            throw new RuntimeException(ex);
+        }
+        return playlist;
+    }
+
+    public void deletePlaylist(Playlist playlist) {
+        try (Connection con = cm.getConnection()) {
+            String sqlcommandInsert = "DELETE FROM playlists WHERE id = ?";
+            PreparedStatement pstmtSelect = con.prepareStatement(sqlcommandInsert);
+            pstmtSelect.setInt(1, playlist.getId());
+            pstmtSelect.execute();
+        }
+        catch (SQLException ex) {
+            throw new RuntimeException(ex);
+        }
+    }
     public boolean editPlaylistName (Playlist playlist) {
         try (Connection con = cm.getConnection()) {
             String sqlcommand = "UPDATE playlists SET name = ? WHERE id = ?";

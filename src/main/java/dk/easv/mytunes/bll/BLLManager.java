@@ -6,8 +6,6 @@ import dk.easv.mytunes.be.Song;
 import dk.easv.mytunes.dal.ChooseFile;
 import dk.easv.mytunes.dal.DALManager;
 import dk.easv.mytunes.exceptions.DBException;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
 import javafx.stage.Window;
@@ -87,5 +85,13 @@ public class BLLManager {
     }
     public List<Category> getAllCategories() {
         return dalManager.getAllCategories();
+    }
+
+    public Playlist addPlaylist(Playlist playlist) {
+        return dalManager.createPlaylist(playlist);
+    }
+
+    public void deletePlaylist(Playlist playlist) {
+        dalManager.deletePlaylist(playlist);
     }
 }
