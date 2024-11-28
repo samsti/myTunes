@@ -14,6 +14,7 @@ public class BLLManager {
     //private double volume;
     private final DALManager dalManager = new DALManager();
     private double volume;
+    private MediaPlayer mediaPlayer;
 
     public List<Song> getAllSongs() throws DBException {
         return dalManager.getAllSongs();
@@ -38,6 +39,7 @@ public class BLLManager {
         MediaPlayer mediaPlayer = new MediaPlayer(media);
 
         // Play the song
+        mediaPlayer.setVolume(volume);
         mediaPlayer.play();
 
         mediaPlayer.setOnEndOfMedia(() -> {
@@ -51,8 +53,9 @@ public class BLLManager {
             throw new IllegalArgumentException("Volume must be between 0.0 and 1.0");
         }
         this.volume = volume;
+        mediaPlayer.setVolume(volume);
     }
-    public double getVolume() {
+    public double getVolume(double v) {
         return volume;
     }
 }

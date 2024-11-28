@@ -73,6 +73,7 @@ public class MainController implements Initializable {
     @FXML private CheckBox cbDeleteFile;
     @FXML private Button btncancDelete;
     @FXML private Button btnYesDelete;
+    @FXML private Slider sldVolume;
     private final static int DELETING_PLAYLIST = 0;
     private final static int DELETING_SONG_FROM_PLAYLIST = 1;
     private final static int DELETING_SONG = 2;
@@ -86,13 +87,14 @@ public class MainController implements Initializable {
         loadSongs();
 
 //        // Adds a listener to any slider changes
-//        volumeSlider.valueProperty().addListener(new ChangeListener<Number>() {
-//            @Override
-//            public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
-//                double volume = newValue.doubleValue();
-//                bllManager.setVolume(volume); //Passes the new volume to the Business Layer
-//            }
-//        });
+        volumeSlider.valueProperty().addListener(new ChangeListener<Number>() {
+            @Override
+            public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
+                double volume = newValue.doubleValue();
+                BLLManager bllManager = new BLLManager();
+                bllManager.setVolume(volume/100); //Passes the new volume to the Business Layer
+            }
+        });
     }
 
     private void loadSongs() {
@@ -230,9 +232,7 @@ public class MainController implements Initializable {
     @FXML
     private void btnPlayClicked(ActionEvent event) {
         BLLManager manager = new BLLManager();
-        manager.playSong(lstSongsInPlaylist.getSelectionModel().getSelectedItem());
-        //manager.playSong(new Song (1, "Silent night", "YT", Time.valueOf("00:02:22"),"C:\\Users\\ervin\\Documents\\School\\SCO1\\Project\\r\\myTunes\\src\\main\\resources\\music\\Silent.mp3",1));
+        //manager.playSong(lstSongsInPlaylist.getSelectionModel().getSelectedItem());
+        manager.playSong(new Song (1, "Silent night", "YT", Time.valueOf("00:02:22"),"C:\\Users\\ervin\\Documents\\School\\SCO1\\Project\\r\\myTunes\\src\\main\\resources\\music\\Silent.mp3",1));
     }
-
-
 }
