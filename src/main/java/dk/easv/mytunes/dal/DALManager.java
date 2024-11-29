@@ -112,20 +112,21 @@ public class DALManager {
     public List<Song> getSongsOnPlaylist(int playlistId) {
         List<Song> songsOnPlaylist = new ArrayList();
         try (Connection con = cm.getConnection()) {
-            String sqlcommandSelect = "SELECT s.id, s.title, s.artist, s.duration, s.file_path, s.category FROM songs_in_playlist sip JOIN songs s ON sip.songId = s.id WHERE sip.playlistId = ? ORDER BY sip.[order];";
+            String sqlcommandSelect = "SELECT s.id, s.title, s.artist, s.duration, s.file_path, s.category, sip.[order] FROM songs_in_playlist sip JOIN songs s ON sip.songId = s.id WHERE sip.playlistId = ? ORDER BY sip.[order];";
             PreparedStatement pstmtSelect = con.prepareStatement(sqlcommandSelect);
             pstmtSelect.setInt(1, playlistId);
             ResultSet rs = pstmtSelect.executeQuery();
             while(rs.next())
             {
-                songsOnPlaylist.add(new Song(
+                Song toAdd = new Song(
                         rs.getInt("id"),
                         rs.getString("title"),
                         rs.getString("artist"),
                         rs.getTime("duration"),
                         rs.getString("file_path"),
-                        rs.getInt("category"))
-                );
+                        rs.getInt("category"));
+                toAdd.setOrder(rs.getInt("order"));
+                songsOnPlaylist.add(toAdd);
             }
         }
         catch (SQLException ex) {
@@ -186,5 +187,58 @@ public class DALManager {
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
+    }
+    public void moveSongUp(Song song, int playlistId, boolean up) {
+        try (Connection con = cm.getConnection()) {
+            int newOrder = 0;
+            int swappingId = 0;
+            
+            //Gets the id of the song where it needs to swap checking the next or the previous order
+            String sqlcommand = "SELECT * FROM songs_in_playlist WHERE playlistId = ? AND [order] " +
+                    (up? "< ":"> ") + "? ORDER BY [order] " +
+                    (up? "DESC":"ASC") + " OFFSET 0 ROWS FETCH NEXT 1 ROW ONLY";
+            PreparedStatement statement = con.prepareStatement(sqlcommand);
+            statement.setInt(1, playlistId);
+            statement.setInt(2, song.getOrder());
+            ResultSet rs = statement.executeQuery();
+            while(rs.next()) {
+                swappingId = rs.getInt("id");
+                newOrder = rs.getInt("order");
+            }
+                        
+            //Update the song which is getting moved
+            sqlcommand = "UPDATE songs_in_playlist SET [order] = ? WHERE songId = ? AND playlistId = ?";
+            statement = con.prepareStatement(sqlcommand);
+            statement.setInt(1, newOrder);
+            statement.setInt(2, song.getId());
+            statement.setInt(3, playlistId);
+            statement.executeUpdate();
+            
+            //Update the song in which's place it got moved to
+            sqlcommand = "UPDATE songs_in_playlist SET [order] = ? WHERE id = ?";
+            statement = con.prepareStatement(sqlcommand);
+            statement.setInt(1, song.getOrder());
+            statement.setInt(2, swappingId);
+            statement.executeUpdate();
+            statement.close();
+            //return true;
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public int getNumberOfSongsInList(int playlistId) {
+        try (Connection con = cm.getConnection()) {
+            String sqlcommand = "SELECT COUNT(*) AS TotalSongs FROM songs_in_playlist WHERE playlistId = ?;";
+            PreparedStatement statement = con.prepareStatement(sqlcommand);
+            statement.setInt(1, playlistId);
+            ResultSet rs = statement.executeQuery();
+            if (rs.next()) {
+                return rs.getInt("TotalSongs"); // Return the count
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+        return 0;
     }
 }

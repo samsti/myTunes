@@ -4,7 +4,6 @@ import dk.easv.mytunes.be.Category;
 import dk.easv.mytunes.be.Playlist;
 import dk.easv.mytunes.be.Song;
 import dk.easv.mytunes.bll.BLLManager;
-import dk.easv.mytunes.dal.ChooseFile;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import dk.easv.mytunes.exceptions.DBException;
@@ -17,7 +16,6 @@ import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
-import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 
 import javax.swing.*;
@@ -79,10 +77,6 @@ public class MainController implements Initializable {
     @FXML private Button btnYesDelete;
     @FXML private Slider sldVolume;
     @FXML private Button btnSavePlaylist;
-    private final static int DELETING_PLAYLIST = 0;
-    private final static int DELETING_SONG_FROM_PLAYLIST = 1;
-    private final static int DELETING_SONG = 2;
-    private final static int DELETING_INVALID = -1;
     private final static String DELETING_DEFAULT_TEXT = "Are you sure you want to delete ";
     private BLLManager manager;
 
@@ -255,7 +249,6 @@ public class MainController implements Initializable {
     }
     @FXML
     private void btnChooseClicked(ActionEvent event) {
-        BLLManager manager = new BLLManager();
         String filepath =  manager.openFile(btnChoose.getScene().getWindow());
         txtFilePath.setText(filepath);
     }
@@ -272,7 +265,6 @@ public class MainController implements Initializable {
     @FXML
     private void btnEditSongClicked(ActionEvent event) {
         Song songToEdit = tblSongs.getSelectionModel().getSelectedItem();
-        System.out.println(songToEdit);
         if (songToEdit != null) {
             openSongsPopUp();
             btnSaveSong.setOnAction(e -> btnSaveSongClickedEdit(event));
@@ -313,6 +305,23 @@ public class MainController implements Initializable {
         }
         else
             throw new RuntimeException("No song selected");
+    }
+    @FXML
+    private void btnMoveSongDownClicked(ActionEvent event) {
+        Song selectedSong = lstSongsInPlaylist.getSelectionModel().getSelectedItem();
+        Playlist selectedPlayList = tblPlaylist.getSelectionModel().getSelectedItem();
+        if (selectedSong != null && selectedPlayList != null) {
+            model.moveSongDownInList(selectedSong, selectedPlayList.getId());
+        }
+    }
+    @FXML
+    private void btnMoveSongUpClicked(ActionEvent event) {
+        Song selectedSong = lstSongsInPlaylist.getSelectionModel().getSelectedItem();
+        Playlist selectedPlayList = tblPlaylist.getSelectionModel().getSelectedItem();
+        if (selectedSong != null && selectedPlayList != null)
+            model.moveSongUpInList(selectedSong, selectedPlayList.getId());
+        model.loadSongsOnPlaylist(selectedPlayList.getId());
+
     }
 
 

@@ -54,4 +54,26 @@ public class MyTunesModel {
     public List<Category> getCategories() {
         return manager.getAllCategories();
     }
+    public void moveSongUpInList(Song song, int playlist){
+        int currentIndex = songsOnPlaylist.indexOf(song);
+
+        if (song.getOrder() > 1 && currentIndex >= 1) {
+                // Swap the items in the ObservableList
+            manager.moveSongUp(song, playlist, true);
+            Song prevSong = songsOnPlaylist.get(currentIndex - 1);
+            songsOnPlaylist.set(currentIndex, prevSong);
+            songsOnPlaylist.set(currentIndex - 1, song);
+        }
+    }
+    public void moveSongDownInList(Song song, int playlist) {
+        int currentIndex = songsOnPlaylist.indexOf(song);
+
+        if (song.getOrder() < manager.numberOfSongsInList(playlist) && (currentIndex < songsOnPlaylist.size() - 1)) {
+                // Swap the items in the ObservableList
+            Song nextSong = songsOnPlaylist.get(currentIndex + 1);
+            songsOnPlaylist.set(currentIndex, nextSong);
+            songsOnPlaylist.set(currentIndex + 1, song);
+            manager.moveSongUp(song, playlist, false);
+        }
+    }
 }

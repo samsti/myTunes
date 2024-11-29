@@ -11,6 +11,7 @@ public class Song {
     private final StringProperty duration;
     private final StringProperty filePath;
     private final IntegerProperty category;
+    private int order;
 
     public Song(int id, String title, String artist, Time duration, String filePath, int category) {
         this.id = new SimpleIntegerProperty(id);
@@ -69,6 +70,12 @@ public class Song {
 
     public void setCategory(int category){
         this.category.set(category);
+    }
+    public int getOrder(){
+        return order;
+    }
+    public void setOrder(int order){
+        this.order = order;
     }
 
     @Override
