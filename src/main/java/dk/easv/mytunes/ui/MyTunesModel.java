@@ -7,8 +7,6 @@ import dk.easv.mytunes.bll.BLLManager;
 import dk.easv.mytunes.exceptions.DBException;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.scene.control.ChoiceBox;
-import javafx.scene.control.TextField;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -56,19 +54,17 @@ public class MyTunesModel {
     public List<Category> getCategories() {
         return manager.getAllCategories();
     }
-
-    public void moveSongUpInList(Song song, int playlist) {
+    public void moveSongUpInList(Song song, int playlist){
         int currentIndex = songsOnPlaylist.indexOf(song);
 
         if (song.getOrder() > 1 && currentIndex >= 1) {
             // Swap the items in the ObservableList
-            manager.moveSong(song, playlist, true);
+            manager.moveSongUp(song, playlist, true);
             Song prevSong = songsOnPlaylist.get(currentIndex - 1);
             songsOnPlaylist.set(currentIndex, prevSong);
             songsOnPlaylist.set(currentIndex - 1, song);
         }
     }
-
     public void moveSongDownInList(Song song, int playlist) {
         int currentIndex = songsOnPlaylist.indexOf(song);
 
@@ -77,24 +73,7 @@ public class MyTunesModel {
             Song nextSong = songsOnPlaylist.get(currentIndex + 1);
             songsOnPlaylist.set(currentIndex, nextSong);
             songsOnPlaylist.set(currentIndex + 1, song);
-            manager.moveSong(song, playlist, false);
+            manager.moveSongUp(song, playlist, false);
         }
-    }
-
-    public void deleteSong(Song selectedSong, boolean deleteFile) {
-        if (selectedSong != null) {
-            if (manager.deletSong(selectedSong, deleteFile))
-                songs.remove(selectedSong);
-            else
-                throw new RuntimeException(deleteFile ?
-                        "Song and/or file could not be deleted" : "Song could not be deleted from database");
-        } else
-            throw new RuntimeException("No song is selected");
-    }
-
-    public void deleteFromPlaylist(Song selectedSongInPlaylist, Playlist selectedPlaylist) {
-        if (selectedSongInPlaylist != null && selectedPlaylist != null)
-            if (manager.deleteFromPlaylist(selectedSongInPlaylist, selectedPlaylist))
-                songsOnPlaylist.remove(selectedSongInPlaylist);
     }
 }
