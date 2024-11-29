@@ -30,8 +30,7 @@ public class DALManager {
             String sqlcommandSelect = "SELECT * FROM songs";
             PreparedStatement pstmtSelect = con.prepareStatement(sqlcommandSelect);
             ResultSet rs = pstmtSelect.executeQuery();
-            while(rs.next())
-            {
+            while (rs.next()) {
                 songs.add(new Song(
                         rs.getInt("id"),
                         rs.getString("title"),
@@ -41,8 +40,7 @@ public class DALManager {
                         rs.getInt("category"))
                 );
             }
-        }
-        catch (SQLException ex) {
+        } catch (SQLException ex) {
             throw new RuntimeException(ex);
         }
         return songs;
@@ -54,8 +52,7 @@ public class DALManager {
             String sqlcommandSelect = "SELECT * FROM playlists";
             PreparedStatement pstmtSelect = con.prepareStatement(sqlcommandSelect);
             ResultSet rs = pstmtSelect.executeQuery();
-            while(rs.next())
-            {
+            while (rs.next()) {
                 playlists.add(new Playlist(
                         rs.getInt("id"),
                         rs.getString("name"),
@@ -63,8 +60,7 @@ public class DALManager {
                         rs.getInt("number_of_songs"))
                 );
             }
-        }
-        catch (SQLException ex) {
+        } catch (SQLException ex) {
             throw new RuntimeException(ex);
         }
         return playlists;
@@ -76,34 +72,30 @@ public class DALManager {
             String sqlcommandSelect = "SELECT * FROM category";
             PreparedStatement pstmtSelect = con.prepareStatement(sqlcommandSelect);
             ResultSet rs = pstmtSelect.executeQuery();
-            while(rs.next())
-            {
+            while (rs.next()) {
                 categories.add(new Category(
                         rs.getInt("id"),
                         rs.getString("category"))
                 );
             }
-        }
-        catch (SQLException ex) {
+        } catch (SQLException ex) {
             throw new RuntimeException(ex);
         }
         return categories;
     }
 
-    public Category getOneCategory (int id) {
+    public Category getOneCategory(int id) {
         try (Connection con = cm.getConnection()) {
             Category category;
             String sqlcommandSelect = "SELECT * FROM category where id = ?";
             PreparedStatement pstmtSelect = con.prepareStatement(sqlcommandSelect);
             pstmtSelect.setInt(1, id);
             ResultSet rs = pstmtSelect.executeQuery();
-            while(rs.next())
-            {
+            while (rs.next()) {
                 category = new Category(rs.getInt("id"), rs.getString("category"));
                 return category;
             }
-        }
-        catch (SQLException ex) {
+        } catch (SQLException ex) {
             throw new RuntimeException(ex);
         }
         throw new RuntimeException("No Category found with id " + id);
@@ -116,8 +108,7 @@ public class DALManager {
             PreparedStatement pstmtSelect = con.prepareStatement(sqlcommandSelect);
             pstmtSelect.setInt(1, playlistId);
             ResultSet rs = pstmtSelect.executeQuery();
-            while(rs.next())
-            {
+            while (rs.next()) {
                 Song toAdd = new Song(
                         rs.getInt("id"),
                         rs.getString("title"),
@@ -128,8 +119,7 @@ public class DALManager {
                 toAdd.setOrder(rs.getInt("order"));
                 songsOnPlaylist.add(toAdd);
             }
-        }
-        catch (SQLException ex) {
+        } catch (SQLException ex) {
             throw new RuntimeException(ex);
         }
         return songsOnPlaylist;
@@ -141,8 +131,7 @@ public class DALManager {
             PreparedStatement pstmtSelect = con.prepareStatement(sqlcommandInsert);
             pstmtSelect.setString(1, playlist.getName());
             pstmtSelect.execute();
-        }
-        catch (SQLException ex) {
+        } catch (SQLException ex) {
             throw new RuntimeException(ex);
         }
         return playlist;
@@ -150,16 +139,20 @@ public class DALManager {
 
     public void deletePlaylist(Playlist playlist) {
         try (Connection con = cm.getConnection()) {
-            String sqlcommandInsert = "DELETE FROM playlists WHERE id = ?";
+            String sqlcommandInsert = "DELETE FROM songs_in_playlist WHERE playlistId = ?";
             PreparedStatement pstmtSelect = con.prepareStatement(sqlcommandInsert);
             pstmtSelect.setInt(1, playlist.getId());
             pstmtSelect.execute();
-        }
-        catch (SQLException ex) {
+            sqlcommandInsert = "DELETE FROM playlists WHERE id = ?";
+            pstmtSelect = con.prepareStatement(sqlcommandInsert);
+            pstmtSelect.setInt(1, playlist.getId());
+            pstmtSelect.execute();
+        } catch (SQLException ex) {
             throw new RuntimeException(ex);
         }
     }
-    public boolean editPlaylistName (Playlist playlist) {
+
+    public boolean editPlaylistName(Playlist playlist) {
         try (Connection con = cm.getConnection()) {
             String sqlcommand = "UPDATE playlists SET name = ? WHERE id = ?";
             PreparedStatement statement = con.prepareStatement(sqlcommand);
@@ -188,24 +181,25 @@ public class DALManager {
             throw new RuntimeException(e);
         }
     }
-    public void moveSongUp(Song song, int playlistId, boolean up) {
+
+    public void moveSong(Song song, int playlistId, boolean up) {
         try (Connection con = cm.getConnection()) {
             int newOrder = 0;
             int swappingId = 0;
-            
+
             //Gets the id of the song where it needs to swap checking the next or the previous order
             String sqlcommand = "SELECT * FROM songs_in_playlist WHERE playlistId = ? AND [order] " +
-                    (up? "< ":"> ") + "? ORDER BY [order] " +
-                    (up? "DESC":"ASC") + " OFFSET 0 ROWS FETCH NEXT 1 ROW ONLY";
+                    (up ? "< " : "> ") + "? ORDER BY [order] " +
+                    (up ? "DESC" : "ASC") + " OFFSET 0 ROWS FETCH NEXT 1 ROW ONLY";
             PreparedStatement statement = con.prepareStatement(sqlcommand);
             statement.setInt(1, playlistId);
             statement.setInt(2, song.getOrder());
             ResultSet rs = statement.executeQuery();
-            while(rs.next()) {
+            while (rs.next()) {
                 swappingId = rs.getInt("id");
                 newOrder = rs.getInt("order");
             }
-                        
+
             //Update the song which is getting moved
             sqlcommand = "UPDATE songs_in_playlist SET [order] = ? WHERE songId = ? AND playlistId = ?";
             statement = con.prepareStatement(sqlcommand);
@@ -213,7 +207,7 @@ public class DALManager {
             statement.setInt(2, song.getId());
             statement.setInt(3, playlistId);
             statement.executeUpdate();
-            
+
             //Update the song in which's place it got moved to
             sqlcommand = "UPDATE songs_in_playlist SET [order] = ? WHERE id = ?";
             statement = con.prepareStatement(sqlcommand);
@@ -240,5 +234,35 @@ public class DALManager {
             throw new RuntimeException(e);
         }
         return 0;
+    }
+
+    public boolean deleteSong(Song song) {
+        try (Connection con = cm.getConnection()) {
+            String sqlcommandInsert = "DELETE FROM songs_in_playlist WHERE songId = ?";
+            PreparedStatement pstmtSelect = con.prepareStatement(sqlcommandInsert);
+            pstmtSelect.setInt(1, song.getId());
+            pstmtSelect.execute();
+            sqlcommandInsert = "DELETE FROM songs WHERE id = ?";
+            pstmtSelect = con.prepareStatement(sqlcommandInsert);
+            pstmtSelect.setInt(1, song.getId());
+            pstmtSelect.execute();
+            return true;
+        } catch (SQLException ex) {
+            throw new RuntimeException(ex);
+        }
+    }
+
+    public boolean deleteFromPlaylist(Song song, Playlist playlist) {
+        try (Connection con = cm.getConnection()) {
+            String sqlcommandInsert = "DELETE FROM songs_in_playlist WHERE songId = ? AND playlistId = ? AND [order] = ?";
+            PreparedStatement pstmtSelect = con.prepareStatement(sqlcommandInsert);
+            pstmtSelect.setInt(1, song.getId());
+            pstmtSelect.setInt(2, playlist.getId());
+            pstmtSelect.setInt(3, song.getOrder());
+            pstmtSelect.execute();
+            return true;
+        } catch (SQLException ex) {
+            throw new RuntimeException(ex);
+        }
     }
 }
