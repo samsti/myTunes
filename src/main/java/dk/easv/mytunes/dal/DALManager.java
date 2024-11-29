@@ -251,4 +251,18 @@ public class DALManager {
             throw new RuntimeException(ex);
         }
     }
+
+    public boolean deleteFromPlaylist(Song song, Playlist playlist) {
+        try (Connection con = cm.getConnection()) {
+            String sqlcommandInsert = "DELETE FROM songs_in_playlist WHERE songId = ? AND playlistId = ? AND [order] = ?";
+            PreparedStatement pstmtSelect = con.prepareStatement(sqlcommandInsert);
+            pstmtSelect.setInt(1, song.getId());
+            pstmtSelect.setInt(2, playlist.getId());
+            pstmtSelect.setInt(3, song.getOrder());
+            pstmtSelect.execute();
+            return true;
+        } catch (SQLException ex) {
+            throw new RuntimeException(ex);
+        }
+    }
 }

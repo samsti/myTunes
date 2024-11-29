@@ -91,4 +91,10 @@ public class MyTunesModel {
         } else
             throw new RuntimeException("No song is selected");
     }
+
+    public void deleteFromPlaylist(Song selectedSongInPlaylist, Playlist selectedPlaylist) {
+        if (selectedSongInPlaylist != null && selectedPlaylist != null)
+            if (manager.deleteFromPlaylist(selectedSongInPlaylist, selectedPlaylist))
+                songsOnPlaylist.remove(selectedSongInPlaylist);
+    }
 }

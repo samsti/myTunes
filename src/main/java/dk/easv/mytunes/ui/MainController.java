@@ -260,6 +260,8 @@ public class MainController implements Initializable {
     }
 
     private void btnYesDeleteFromPlaylistClicked(ActionEvent event) {
+        Song songToDelete = getSelectedSongInPlaylist();
+        model.deleteFromPlaylist(songToDelete, getSelectedPlaylist());
     }
 
     @FXML
@@ -368,7 +370,7 @@ public class MainController implements Initializable {
 
     @FXML
     private void btnMoveSongDownClicked(ActionEvent event) {
-        Song selectedSong = lstSongsInPlaylist.getSelectionModel().getSelectedItem();
+        Song selectedSong = getSelectedSongInPlaylist();
         Playlist selectedPlayList = getSelectedPlaylist();
         if (selectedSong != null && selectedPlayList != null) {
             model.moveSongDownInList(selectedSong, selectedPlayList.getId());
@@ -377,7 +379,7 @@ public class MainController implements Initializable {
 
     @FXML
     private void btnMoveSongUpClicked(ActionEvent event) {
-        Song selectedSong = lstSongsInPlaylist.getSelectionModel().getSelectedItem();
+        Song selectedSong = getSelectedSongInPlaylist();
         Playlist selectedPlayList = getSelectedPlaylist();
         if (selectedSong != null && selectedPlayList != null)
             model.moveSongUpInList(selectedSong, selectedPlayList.getId());

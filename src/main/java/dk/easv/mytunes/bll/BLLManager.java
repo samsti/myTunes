@@ -135,4 +135,8 @@ public class BLLManager {
             throw new RuntimeException(e);
         }
     }
+
+    public boolean deleteFromPlaylist(Song selectedSongInPlaylist, Playlist selectedPlaylist) {
+        return dalManager.deleteFromPlaylist(selectedSongInPlaylist, selectedPlaylist);
+    }
 }
