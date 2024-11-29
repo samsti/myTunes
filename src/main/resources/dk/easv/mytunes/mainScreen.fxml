@@ -20,10 +20,10 @@
    <children>
       <AnchorPane prefHeight="600.0" prefWidth="800.0">
          <children>
-            <Button fx:id="btnBack" layoutX="15.0" layoutY="58.0" mnemonicParsing="false" text="Back" />
+            <Button fx:id="btnBack" layoutX="19.0" layoutY="58.0" mnemonicParsing="false" text="Back" />
             <Button fx:id="btnPlay" layoutX="66.0" layoutY="58.0" mnemonicParsing="false" onAction="#btnPlayClicked" text="Play" />
-            <Button fx:id="btnNext" layoutX="114.0" layoutY="58.0" mnemonicParsing="false" text="Next" />
-            <Slider fx:id="volumeSlider" layoutX="15.0" layoutY="89.0" showTickMarks="true" value="50.0" />
+            <Button fx:id="btnNext" layoutX="160.0" layoutY="58.0" mnemonicParsing="false" text="Next" />
+            <Slider fx:id="volumeSlider" layoutX="40.0" layoutY="89.0" min="0.0" max="100.0" onMouseDragged="#setVolume" showTickMarks="true" value="50.0" />
             <Label fx:id="lblPlaying" layoutX="360.0" layoutY="88.0" text="Now playing ...." />
             <TextField fx:id="txtFilter" layoutX="582.0" layoutY="84.0" promptText="Filter" />
             <Button fx:id="btnFilter" layoutX="743.0" layoutY="84.0" mnemonicParsing="false" onAction="#searchSongs" text="Filter" />
@@ -57,6 +57,7 @@
             <Button fx:id="btnEditSong" layoutX="519.0" layoutY="551.0" mnemonicParsing="false" onAction="#btnEditSongClicked" text="Edit" />
             <Button fx:id="btnDeleteSong" layoutX="571.0" layoutY="551.0" mnemonicParsing="false" onAction="#btnDeleteSongClicked" text="Delete" />
             <Button fx:id="btnClose" layoutX="706.0" layoutY="551.0" mnemonicParsing="false" onAction="#btnCloseClicked" text="Close" />
+            <Button fx:id="btnStop" layoutX="110.0" layoutY="59.0" mnemonicParsing="false" onAction="#btnStopClicked" text="Stop" />
          </children>
       </AnchorPane>
       <VBox fx:id="popupBg" prefHeight="600" prefWidth="800" styleClass="popup-bg" visible="false" />

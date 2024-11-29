@@ -14,14 +14,15 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
+import javafx.scene.media.MediaPlayer;
 import javafx.stage.Stage;
 
-import javax.swing.*;
-import javax.swing.table.TableColumnModel;
-import javax.swing.table.TableModel;
-import javax.swing.table.TableRowSorter;
+import javafx.scene.media.Media;
+
+import java.io.File;
 import java.net.URL;
 import java.sql.Time;
 import java.util.ResourceBundle;
@@ -31,6 +32,7 @@ public class MainController implements Initializable {
 
     @FXML private StackPane rootPane;
     @FXML private Button btnPlay;
+    @FXML private Button btnStop;
     @FXML private Button btnNewPlayList;
     @FXML private Button btnEditPlayList;
     @FXML private Button btnDeletePlayList;
@@ -77,8 +79,11 @@ public class MainController implements Initializable {
     @FXML private Button btnYesDelete;
     @FXML private Slider sldVolume;
     @FXML private Button btnSavePlaylist;
+    @FXML private Label lblPlaying;
     private final static String DELETING_DEFAULT_TEXT = "Are you sure you want to delete ";
     private BLLManager manager;
+    private MediaPlayer mediaPlayer;
+    private boolean isPaused = false;
 
 
     @Override
@@ -184,6 +189,7 @@ public class MainController implements Initializable {
     private void btnCancelSongClicked(ActionEvent event) {
         closeSongsPopUp();
     }
+
     @FXML
     private void btnDeletePlayListClicked (ActionEvent event) {
         if (tblPlaylist.getSelectionModel().getSelectedItem() != null) {
@@ -239,14 +245,58 @@ public class MainController implements Initializable {
     }
     @FXML
     private void btnPlayClicked(ActionEvent event) {
-        BLLManager manager = new BLLManager();
-        //manager.playSong(lstSongsInPlaylist.getSelectionModel().getSelectedItem());
-        manager.playSong(new Song (1, "Silent night", "YT", Time.valueOf("00:02:22"),"C:\\Users\\ervin\\Documents\\School\\SCO1\\Project\\r\\myTunes\\src\\main\\resources\\music\\Silent.mp3",1));
-        if (manager.isPlaying())
-            btnPlay.setText("Pause");
-        else
-            btnPlay.setText("Play");
+        try {
+            if (mediaPlayer != null) {
+                if (mediaPlayer.getStatus() == MediaPlayer.Status.PLAYING) {
+                    mediaPlayer.pause();
+                    Song songToPlay = tblSongs.getSelectionModel().getSelectedItem();
+                    String path = songToPlay.getFilePath();
+                    Media media = new Media(new File(path).toURI().toString());
+                    mediaPlayer = new MediaPlayer(media);
+                    lblPlaying.setText(songToPlay.getTitle());
+                    mediaPlayer.play();
+                    isPaused = true;
+                    return;
+                } else if (mediaPlayer.getStatus() == MediaPlayer.Status.PAUSED) {
+                    mediaPlayer.play();
+                    isPaused = false;
+                    return;
+                }
+            }
+
+            try {
+                Song songToPlay = tblSongs.getSelectionModel().getSelectedItem();
+                if (songToPlay != null) {
+                    String path = songToPlay.getFilePath();
+                    Media media = new Media(new File(path).toURI().toString());
+                    mediaPlayer = new MediaPlayer(media);
+                    lblPlaying.setText(songToPlay.getTitle());
+
+                    mediaPlayer.play();
+                    isPaused = false;
+                }
+            }
+            catch (Exception e) {
+                e.printStackTrace();
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
+    @FXML
+    private void btnStopClicked(ActionEvent event) {
+        if (mediaPlayer != null && mediaPlayer.getStatus() == MediaPlayer.Status.PLAYING) {
+            mediaPlayer.pause();
+            isPaused = true;
+        }
+    }
+
+    @FXML
+    private void setVolume(MouseEvent event) {
+        mediaPlayer.setVolume(manager.getVolume());
+    }
+
     @FXML
     private void btnChooseClicked(ActionEvent event) {
         String filepath =  manager.openFile(btnChoose.getScene().getWindow());

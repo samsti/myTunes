@@ -52,13 +52,13 @@ public class BLLManager {
     }
 
     public void setVolume(double volume) {
-        if(volume < 0.0 || volume > 1.0) {
+        if(volume < 0.0 || volume > 100.0) {
             throw new IllegalArgumentException("Volume must be between 0.0 and 1.0");
         }
         this.volume = volume;
         mediaPlayer.setVolume(volume);
     }
-    public double getVolume(double v) {
+    public double getVolume() {
         return volume;
     }
 
