@@ -5,12 +5,15 @@ import dk.easv.mytunes.be.Playlist;
 import dk.easv.mytunes.be.Song;
 import dk.easv.mytunes.dal.ChooseFile;
 import dk.easv.mytunes.dal.DALManager;
+import dk.easv.mytunes.dal.FileManager;
 import dk.easv.mytunes.exceptions.DBException;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
 import javafx.stage.Window;
 
 import java.io.File;
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 public class BLLManager {
@@ -31,7 +34,7 @@ public class BLLManager {
         return dalManager.getSongsOnPlaylist(playlistId);
     }
 
-    public void playSong (Song song) throws DBException {
+    public void playSong(Song song) throws DBException {
         String filePath = song.getFilePath();
         //System.out.println(filePath);
 
@@ -52,12 +55,13 @@ public class BLLManager {
     }
 
     public void setVolume(double volume) {
-        if(volume < 0.0 || volume > 1.0) {
+        if (volume < 0.0 || volume > 1.0) {
             throw new IllegalArgumentException("Volume must be between 0.0 and 1.0");
         }
         this.volume = volume;
         mediaPlayer.setVolume(volume);
     }
+
     public double getVolume(double v) {
         return volume;
     }
@@ -74,15 +78,19 @@ public class BLLManager {
         ChooseFile fileBrowser = new ChooseFile(window);
         return fileBrowser.getSelectedFilePath();
     }
+
     public boolean editPlaylistName(Playlist playlist) {
         return dalManager.editPlaylistName(playlist);
     }
+
     public boolean editSong(Song song) {
         return dalManager.editSong(song);
     }
+
     public Category returnCategoryName(int id) {
         return dalManager.getOneCategory(id);
     }
+
     public List<Category> getAllCategories() {
         return dalManager.getAllCategories();
     }
@@ -94,10 +102,37 @@ public class BLLManager {
     public void deletePlaylist(Playlist playlist) {
         dalManager.deletePlaylist(playlist);
     }
-    public void moveSongUp(Song song, int playlist, boolean up) {
-            dalManager.moveSongUp(song, playlist, up);
+
+    public void moveSong(Song song, int playlist, boolean up) {
+        dalManager.moveSong(song, playlist, up);
     }
+
     public int numberOfSongsInList(int playlistId) {
         return dalManager.getNumberOfSongsInList(playlistId);
+    }
+
+    public boolean deletSong(Song selectedSong, boolean deleteFile) {
+        if (dalManager.deleteSong(selectedSong)) {
+            if (deleteFile) {
+                FileManager fileManager = new FileManager();
+                if (fileManager.deleteFile(selectedSong.getFilePath()))
+                    return true;
+                else
+                    throw new RuntimeException("File could not be deleted");
+            }
+            return true;
+        } else
+            throw new RuntimeException("Song could not be deleted from database");
+    }
+
+
+    private String checkForValidTime(String time) {
+        try {
+            LocalTime localTime = LocalTime.parse(time);
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm:ss");
+            return localTime.format(formatter);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 }
