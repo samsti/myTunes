@@ -202,20 +202,31 @@ public class MainController implements Initializable {
     private void btnDeleteFromPlaylistClicked(ActionEvent event) {
         if (lstSongsInPlaylist.getSelectionModel().getSelectedItem() != null) {
             openDeleteWindow();
-            Playlist playlistToDeleteFrom = tblPlaylist.getSelectionModel().getSelectedItem();
+            btnYesDelete.setOnAction(e -> btnYesDeleteFromPlaylistClicked(event));
+            Playlist playlistToDeleteFrom = getSelectedPlaylist();
             Song songToDelete = lstSongsInPlaylist.getSelectionModel().getSelectedItem();
             lblDeleting.setText(DELETING_DEFAULT_TEXT + songToDelete.getTitle()
                     + "\nfrom playlist: " + playlistToDeleteFrom.getName() + "?");
         }
+    }
+    private void btnYesDeleteFromPlaylistClicked(ActionEvent event) {
+        Song songToDelete = getSelectedSongInPlaylist();
+        model.deleteFromPlaylist(songToDelete, getSelectedPlaylist());
+        closeDeleteWindow();
     }
     @FXML
     private void btnDeleteSongClicked(ActionEvent event) {
         if (tblSongs.getSelectionModel().getSelectedItem() != null) {
             openDeleteWindow();
             cbDeleteFile.setVisible(true);
-            Song songToDelete = tblSongs.getSelectionModel().getSelectedItem();
+            btnYesDelete.setOnAction(e -> btnYesDeleteSongClicked(event));
+            Song songToDelete = getSelectedSong();
             lblDeleting.setText(DELETING_DEFAULT_TEXT + songToDelete.getTitle() + " song?");
         }
+    }
+    private void btnYesDeleteSongClicked(ActionEvent event) {
+        model.deleteSong(getSelectedSong(), cbDeleteFile.isSelected());
+        closeDeleteWindow();
     }
 
     @FXML
@@ -223,15 +234,10 @@ public class MainController implements Initializable {
         closeDeleteWindow();
     }
 
-    private Playlist getSelectedPlaylist() {
-        return tblPlaylist.getSelectionModel().getSelectedItem();
-    }
-
     @FXML
     private void btnYesDeleteClicked(ActionEvent event) {
         model.deletePlaylist(getSelectedPlaylist());
-        popupBg.setVisible(false);
-        popupDelete.setVisible(false);
+        closeDeleteWindow();
     }
 
     @FXML
@@ -419,5 +425,21 @@ public class MainController implements Initializable {
         cbDeleteFile.setSelected(false);
         popupBg.setVisible(false);
         popupDelete.setVisible(false);
+    }
+
+    /**
+     * Gets the selected items from the tables/list
+     */
+
+    private Song getSelectedSong() {
+        return tblSongs.getSelectionModel().getSelectedItem();
+    }
+
+    private Playlist getSelectedPlaylist() {
+        return tblPlaylist.getSelectionModel().getSelectedItem();
+    }
+
+    private Song getSelectedSongInPlaylist() {
+        return lstSongsInPlaylist.getSelectionModel().getSelectedItem();
     }
 }

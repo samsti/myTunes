@@ -5,6 +5,7 @@ import dk.easv.mytunes.be.Playlist;
 import dk.easv.mytunes.be.Song;
 import dk.easv.mytunes.dal.ChooseFile;
 import dk.easv.mytunes.dal.DALManager;
+import dk.easv.mytunes.dal.FileManager;
 import dk.easv.mytunes.exceptions.DBException;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
@@ -99,5 +100,21 @@ public class BLLManager {
     }
     public int numberOfSongsInList(int playlistId) {
         return dalManager.getNumberOfSongsInList(playlistId);
+    }
+    public boolean deleteFromPlaylist(Song selectedSongInPlaylist, Playlist selectedPlaylist) {
+        return dalManager.deleteFromPlaylist(selectedSongInPlaylist, selectedPlaylist);
+    }
+    public boolean deletSong(Song selectedSong, boolean deleteFile) {
+        if (dalManager.deleteSong(selectedSong)) {
+            if (deleteFile) {
+                FileManager fileManager = new FileManager();
+                if (fileManager.deleteFile(selectedSong.getFilePath()))
+                    return true;
+                else
+                    throw new RuntimeException("File could not be deleted");
+            }
+            return true;
+        } else
+            throw new RuntimeException("Song could not be deleted from database");
     }
 }

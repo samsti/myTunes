@@ -75,4 +75,20 @@ public class MyTunesModel {
             manager.moveSongUp(song, playlist, false);
         }
     }
+
+    public void deleteFromPlaylist(Song selectedSongInPlaylist, Playlist selectedPlaylist) {
+        if (selectedSongInPlaylist != null && selectedPlaylist != null)
+            if (manager.deleteFromPlaylist(selectedSongInPlaylist, selectedPlaylist))
+                songsOnPlaylist.remove(selectedSongInPlaylist);
+    }
+    public void deleteSong(Song selectedSong, boolean deleteFile) {
+        if (selectedSong != null) {
+            if (manager.deletSong(selectedSong, deleteFile))
+                songs.remove(selectedSong);
+            else
+                throw new RuntimeException(deleteFile ?
+                        "Song and/or file could not be deleted" : "Song could not be deleted from database");
+        } else
+            throw new RuntimeException("No song is selected");
+    }
 }
