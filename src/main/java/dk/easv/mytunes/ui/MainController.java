@@ -470,4 +470,12 @@ public class MainController implements Initializable {
     private Song getSelectedSongInPlaylist() {
         return lstSongsInPlaylist.getSelectionModel().getSelectedItem();
     }
+
+    public void addSongToPlaylist(ActionEvent actionEvent) {
+        int songId = getSelectedSong().getId();
+        int playlistId = getSelectedPlaylist().getId();
+        model.addSongToPlaylist(playlistId, songId);
+        model.loadSongsOnPlaylist(playlistId);
+        lstSongsInPlaylist.setItems(model.getSongsOnPlaylist());
+    }
 }

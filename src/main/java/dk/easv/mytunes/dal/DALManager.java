@@ -161,6 +161,18 @@ public class DALManager {
         return playlist;
     }
 
+    public void addSongToPlaylist(int playlistId, int songId) {
+        try (Connection con = cm.getConnection()) {
+            String sqlcommandInsert = "INSERT INTO songs_in_playlist (playlistId, songId) VALUES (?, ?)";
+            PreparedStatement pstmtSelect = con.prepareStatement(sqlcommandInsert);
+            pstmtSelect.setInt(1, playlistId);
+            pstmtSelect.setInt(2, songId);
+            pstmtSelect.execute();
+        } catch (SQLException ex) {
+            throw new RuntimeException(ex);
+        }
+    }
+
     public void deletePlaylist(Playlist playlist) {
         try (Connection con = cm.getConnection()) {
             String sqlcommandInsert = "DELETE FROM songs_in_playlist WHERE playlistId = ?";

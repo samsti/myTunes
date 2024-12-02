@@ -49,7 +49,7 @@
             <Label layoutX="14.0" layoutY="125.0" text="Playlists" />
             <Label layoutX="223.0" layoutY="125.0" text="Songs on Playlist" />
             <Label layoutX="457.0" layoutY="125.0" text="Songs" />
-            <Button fx:id="btnAddSongToPlayList" layoutX="426.0" layoutY="148.0" mnemonicParsing="false" text="&lt;-" />
+            <Button fx:id="btnAddSongToPlayList" layoutX="426.0" layoutY="148.0" mnemonicParsing="false" onAction="#addSongToPlaylist" text="&lt;-" />
             <Button fx:id="btnMoveSongUp" layoutX="254.0" layoutY="551.0" mnemonicParsing="false" onAction="#btnMoveSongUpClicked" text="▲" />
             <Button fx:id="btnMoveSongDown" layoutX="286.0" layoutY="551.0" mnemonicParsing="false" onAction="#btnMoveSongDownClicked" text="▼" />
             <Button fx:id="btnDeleteFromPlaylist" layoutX="334.0" layoutY="551.0" mnemonicParsing="false" onAction="#btnDeleteFromPlaylistClicked" text="Delete" />

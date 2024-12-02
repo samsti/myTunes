@@ -85,6 +85,10 @@ public class MyTunesModel {
         }
     }
 
+    public void addSongToPlaylist(int playlistId, int songId) throws DBException {
+        manager.addSongToPlaylist(playlistId, songId);
+    }
+
     public void deleteFromPlaylist(Song selectedSongInPlaylist, Playlist selectedPlaylist) {
         if (selectedSongInPlaylist != null && selectedPlaylist != null)
             if (manager.deleteFromPlaylist(selectedSongInPlaylist, selectedPlaylist))
