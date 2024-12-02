@@ -46,6 +46,30 @@ public class DALManager {
         return songs;
     }
 
+    public List<Song> getFilteredSongs(String filter) {
+        List<Song> filteredSongs = new ArrayList();
+        try (Connection con = cm.getConnection()) {
+            String sqlcommandSelect = "SELECT * FROM songs WHERE title LIKE ? OR artist LIKE ?;";
+            PreparedStatement pstmtSelect = con.prepareStatement(sqlcommandSelect);
+            pstmtSelect.setString(1, "%" + filter + "%");
+            pstmtSelect.setString(2, "%" + filter + "%");
+            ResultSet rs = pstmtSelect.executeQuery();
+            while (rs.next()) {
+                filteredSongs.add(new Song(
+                        rs.getInt("id"),
+                        rs.getString("title"),
+                        rs.getString("artist"),
+                        rs.getTime("duration"),
+                        rs.getString("file_path"),
+                        rs.getInt("category"))
+                );
+            }
+        } catch (SQLException ex) {
+            throw new RuntimeException(ex);
+        }
+        return filteredSongs;
+    }
+
     public List<Playlist> getAllPlaylists() {
         List<Playlist> playlists = new ArrayList();
         try (Connection con = cm.getConnection()) {

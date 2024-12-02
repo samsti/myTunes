@@ -13,6 +13,7 @@ import java.util.List;
 public class MyTunesModel {
     private final BLLManager manager = new BLLManager();
     private final ObservableList<Song> songs = FXCollections.observableArrayList();
+    private final ObservableList<Song> filteredSongs = FXCollections.observableArrayList();
     private final ObservableList<Playlist> playlists = FXCollections.observableArrayList();
     private final ObservableList<Song> songsOnPlaylist = FXCollections.observableArrayList();
 
@@ -22,6 +23,14 @@ public class MyTunesModel {
 
     public ObservableList<Song> getSongs() {
         return songs;
+    }
+
+    public void loadFilteredSongs(String filter) throws DBException {
+        filteredSongs.setAll(manager.getFilteredSongs(filter));
+    }
+
+    public ObservableList<Song> getFilteredSongs() {
+        return filteredSongs;
     }
 
     public void loadPlaylists() throws DBException {
