@@ -263,10 +263,14 @@ public class MainController implements Initializable {
                     mediaPlayer.play();
                     isPaused = true;
                     return;
-                } else if (mediaPlayer.getStatus() == MediaPlayer.Status.PAUSED) {
+                }
+                else if (mediaPlayer.getStatus() == MediaPlayer.Status.PAUSED) {
                     mediaPlayer.play();
                     isPaused = false;
                     return;
+                }
+                else {
+                    lblPlaying.setText("Something went wrong");
                 }
             }
 
@@ -274,12 +278,14 @@ public class MainController implements Initializable {
                 Song songToPlay = tblSongs.getSelectionModel().getSelectedItem();
                 if (songToPlay != null) {
                     String path = songToPlay.getFilePath();
+                    if (path != null) {
                     Media media = new Media(new File(path).toURI().toString());
                     mediaPlayer = new MediaPlayer(media);
                     lblPlaying.setText(songToPlay.getTitle());
 
                     mediaPlayer.play();
                     isPaused = false;
+                    }
                 }
             }
             catch (Exception e) {
