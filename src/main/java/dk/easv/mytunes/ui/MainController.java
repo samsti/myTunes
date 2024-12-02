@@ -24,7 +24,12 @@ import javafx.scene.media.Media;
 
 import java.io.File;
 import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.sql.Time;
+import java.util.List;
+import java.util.Objects;
 import java.util.ResourceBundle;
 
 public class MainController implements Initializable {
@@ -80,6 +85,8 @@ public class MainController implements Initializable {
     @FXML private Slider sldVolume;
     @FXML private Button btnSavePlaylist;
     @FXML private Label lblPlaying;
+    @FXML private Button btnNext;
+    @FXML private Button btnBack;
     private final static String DELETING_DEFAULT_TEXT = "Are you sure you want to delete ";
     private BLLManager manager;
     private MediaPlayer mediaPlayer;
@@ -252,56 +259,37 @@ public class MainController implements Initializable {
     @FXML
     private void btnPlayClicked(ActionEvent event) {
         try {
-            if (mediaPlayer != null) {
-                if (mediaPlayer.getStatus() == MediaPlayer.Status.PLAYING) {
-                    mediaPlayer.pause();
-                    Song songToPlay = tblSongs.getSelectionModel().getSelectedItem();
-                    String path = songToPlay.getFilePath();
-                    Media media = new Media(new File(path).toURI().toString());
-                    mediaPlayer = new MediaPlayer(media);
-                    lblPlaying.setText(songToPlay.getTitle());
-                    mediaPlayer.play();
-                    isPaused = true;
-                    return;
-                }
-                else if (mediaPlayer.getStatus() == MediaPlayer.Status.PAUSED) {
-                    mediaPlayer.play();
-                    isPaused = false;
-                    return;
-                }
-                else {
-                    lblPlaying.setText("Something went wrong");
-                }
+            Song songToPlay = tblSongs.getSelectionModel().getSelectedItem();
+            if (songToPlay == null) {
+                lblPlaying.setText("No song selected.");
+                return;
             }
 
-            try {
-                Song songToPlay = tblSongs.getSelectionModel().getSelectedItem();
-                if (songToPlay != null) {
-                    String path = songToPlay.getFilePath();
-                    if (path != null) {
-                    Media media = new Media(new File(path).toURI().toString());
-                    mediaPlayer = new MediaPlayer(media);
-                    lblPlaying.setText(songToPlay.getTitle());
-
-                    mediaPlayer.play();
-                    isPaused = false;
-                    }
-                }
-            }
-            catch (Exception e) {
-                e.printStackTrace();
-            }
-
+            manager.playSong(songToPlay);
+            lblPlaying.setText(songToPlay.getTitle());
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
+
     @FXML
     private void btnStopClicked(ActionEvent event) {
-        if (mediaPlayer != null && mediaPlayer.getStatus() == MediaPlayer.Status.PLAYING) {
-            mediaPlayer.pause();
-            isPaused = true;
+        try {
+            manager.stopSong();
+            isPaused = false;
+        } catch (Exception e) {
+            e.printStackTrace();
         }
+    }
+
+    @FXML
+    private void btnPlayNextClicked(ActionEvent event) throws Exception {
+
+    }
+
+    @FXML
+    private void btnPlayPreviousClicked(ActionEvent event) {
+
     }
 
     @FXML

@@ -12,13 +12,20 @@ import javafx.scene.media.MediaPlayer;
 import javafx.stage.Window;
 
 import java.io.File;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
+
+
 
 public class BLLManager {
     //private double volume;
     private final DALManager dalManager = new DALManager();
     private double volume;
     private MediaPlayer mediaPlayer;
+    private Song currentSong;
+
 
     public List<Song> getAllSongs() throws DBException {
         return dalManager.getAllSongs();
@@ -32,24 +39,55 @@ public class BLLManager {
         return dalManager.getSongsOnPlaylist(playlistId);
     }
 
-    public void playSong (Song song) throws DBException {
+    public void playSong(Song song) throws Exception {
+
+        currentSong = song;
+
+        if (song == null) {
+            throw new IllegalArgumentException("No song provided.");
+        }
+
         String filePath = song.getFilePath();
-        //System.out.println(filePath);
+        Path path = Paths.get(filePath);
 
-        // Create a Media object
+        if (!Files.exists(path)) {
+            throw new Exception("Path to song does not exist: " + filePath);
+        }
+
+        if (mediaPlayer != null) {
+            if (mediaPlayer.getStatus() == MediaPlayer.Status.PAUSED) {
+                mediaPlayer.play();
+                return;
+            } else {
+                mediaPlayer.stop();
+                mediaPlayer.dispose();
+            }
+        }
+
         Media media = new Media(new File(filePath).toURI().toString());
-
-        // Create a MediaPlayer object
         mediaPlayer = new MediaPlayer(media);
-        volume = 0.2;
-        // Play the song
         mediaPlayer.setVolume(volume);
         mediaPlayer.play();
 
         mediaPlayer.setOnEndOfMedia(() -> {
             System.out.println("Song finished playing.");
-            mediaPlayer.stop(); // Stops the player when finished
+            mediaPlayer.stop();
         });
+    }
+
+
+    public void stopSong() throws Exception {
+        if (mediaPlayer != null && mediaPlayer.getStatus() == MediaPlayer.Status.PLAYING) {
+            mediaPlayer.pause();
+        }
+    }
+
+    public void playNextSong() throws Exception {
+        currentSong.getId();
+    }
+
+    public void playPreviousSong() throws Exception {
+
     }
 
     public void setVolume(double volume) {
