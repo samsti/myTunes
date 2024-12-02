@@ -121,4 +121,8 @@ public class BLLManager {
         } else
             throw new RuntimeException("Song could not be deleted from database");
     }
+
+    public void addSongToPlaylist(int playlistId, int songId) {
+        dalManager.addSongToPlaylist(playlistId, songId);
+    }
 }
