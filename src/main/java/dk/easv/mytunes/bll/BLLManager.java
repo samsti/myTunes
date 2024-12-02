@@ -24,6 +24,10 @@ public class BLLManager {
         return dalManager.getAllSongs();
     }
 
+    public List<Song> getFilteredSongs(String filter) throws DBException {
+        return dalManager.getFilteredSongs(filter);
+    }
+
     public List<Playlist> getAllPlaylists() throws DBException {
         return dalManager.getAllPlaylists();
     }

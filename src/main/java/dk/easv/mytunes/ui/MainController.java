@@ -30,6 +30,7 @@ import java.util.ResourceBundle;
 public class MainController implements Initializable {
 
 
+    @FXML private Button btnFilter;
     @FXML private StackPane rootPane;
     @FXML private Button btnPlay;
     @FXML private Button btnStop;
@@ -84,6 +85,7 @@ public class MainController implements Initializable {
     private BLLManager manager;
     private MediaPlayer mediaPlayer;
     private boolean isPaused = false;
+    private boolean isFilterMode = true;
 
 
     @Override
@@ -247,8 +249,26 @@ public class MainController implements Initializable {
     }
     @FXML
     private void searchSongs(ActionEvent event) {
+        String textFilter = txtFilter.getText().trim();
 
+        if(isFilterMode) {
+            if (textFilter.isBlank()) {
+                System.out.println("Blank");
+            } else {
+                model.loadFilteredSongs(textFilter);
+                tblSongs.setItems(model.getFilteredSongs());
+                btnFilter.setText("Clear");
+                isFilterMode = false;
+            }
+        } else {
+            txtFilter.setText("");
+            btnFilter.setText("Filter");
+            loadSongs();
+            isFilterMode = true;
+        }
     }
+
+
     @FXML
     private void btnPlayClicked(ActionEvent event) {
         try {
