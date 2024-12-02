@@ -93,7 +93,7 @@ public class MainController implements Initializable {
         popupBg.setPrefHeight(rootPane.getHeight());
         loadSongs();
 
-//        // Adds a listener to any slider changes
+       // Adds a listener to any slider changes
         volumeSlider.valueProperty().addListener(new ChangeListener<Number>() {
             @Override
             public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
@@ -337,6 +337,9 @@ public class MainController implements Initializable {
             txtTime.setText(songToEdit.getDuration());
             choiceCategory.setValue(manager.returnCategoryName(songToEdit.getCategory()));
         }
+        else {
+            throw new RuntimeException("No song selected");
+        }
     }
     @FXML
     private void btnSaveSongClicked(ActionEvent event) {
@@ -350,8 +353,7 @@ public class MainController implements Initializable {
             if (manager.editSong(songToEdit))
                 closeSongsPopUp();
         }
-        else
-            throw new RuntimeException("No song selected");
+
     }
     @FXML
     private void btnSaveSongClickedEdit(ActionEvent event) {
