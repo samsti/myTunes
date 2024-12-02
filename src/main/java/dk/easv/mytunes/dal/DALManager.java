@@ -4,6 +4,7 @@ import dk.easv.mytunes.be.Category;
 import dk.easv.mytunes.be.Playlist;
 import dk.easv.mytunes.be.Song;
 import dk.easv.mytunes.exceptions.DBException;
+import javafx.scene.control.Alert;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -163,15 +164,35 @@ public class DALManager {
 
     public void addSongToPlaylist(int playlistId, int songId) {
         try (Connection con = cm.getConnection()) {
-            String sqlcommandInsert = "INSERT INTO songs_in_playlist (playlistId, songId) VALUES (?, ?)";
-            PreparedStatement pstmtSelect = con.prepareStatement(sqlcommandInsert);
-            pstmtSelect.setInt(1, playlistId);
-            pstmtSelect.setInt(2, songId);
-            pstmtSelect.execute();
+            String sqlCheck = "SELECT * FROM songs_in_playlist WHERE playlistId = ? AND songId = ?";
+            PreparedStatement pstmtCheck = con.prepareStatement(sqlCheck);
+            pstmtCheck.setInt(1, playlistId);
+            pstmtCheck.setInt(2, songId);
+            ResultSet rs = pstmtCheck.executeQuery();
+
+            if (rs.next()) {
+                showAlert("Duplicate Entry", "This song is already in the playlist!");
+                return;
+            }
+
+            String sqlInsert = "INSERT INTO songs_in_playlist (playlistId, songId) VALUES (?, ?)";
+            PreparedStatement pstmtInsert = con.prepareStatement(sqlInsert);
+            pstmtInsert.setInt(1, playlistId);
+            pstmtInsert.setInt(2, songId);
+            pstmtInsert.executeUpdate();
+
         } catch (SQLException ex) {
             throw new RuntimeException(ex);
         }
     }
+
+    private void showAlert(String title, String message) {
+        Alert alert = new Alert(Alert.AlertType.WARNING);
+        alert.setTitle(title);
+        alert.setContentText(message);
+        alert.showAndWait();
+    }
+
 
     public void deletePlaylist(Playlist playlist) {
         try (Connection con = cm.getConnection()) {
