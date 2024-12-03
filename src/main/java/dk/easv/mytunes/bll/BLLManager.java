@@ -166,8 +166,8 @@ public class BLLManager {
     public int numberOfSongsInList(int playlistId) {
         return dalManager.getNumberOfSongsInList(playlistId);
     }
-    public boolean deleteFromPlaylist(Song selectedSongInPlaylist, Playlist selectedPlaylist) {
-        return dalManager.deleteFromPlaylist(selectedSongInPlaylist, selectedPlaylist);
+    public void deleteFromPlaylist(Song selectedSongInPlaylist, Playlist selectedPlaylist) {
+        dalManager.deleteFromPlaylist(selectedSongInPlaylist, selectedPlaylist);
     }
     public boolean deletSong(Song selectedSong, boolean deleteFile) {
         if (dalManager.deleteSong(selectedSong)) {

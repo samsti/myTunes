@@ -161,35 +161,18 @@ public class DALManager {
 
     public void addSongToPlaylist(int playlistId, int songId) {
         try (Connection con = cm.getConnection()) {
-            String sqlCheck = "SELECT * FROM songs_in_playlist WHERE playlistId = ? AND songId = ?";
-            PreparedStatement pstmtCheck = con.prepareStatement(sqlCheck);
-            pstmtCheck.setInt(1, playlistId);
-            pstmtCheck.setInt(2, songId);
-            ResultSet rs = pstmtCheck.executeQuery();
-
-            if (rs.next()) {
-                showAlert("Duplicate Entry", "This song is already in the playlist!");
-                return;
-            }
-
-            String sqlInsert = "INSERT INTO songs_in_playlist (playlistId, songId) VALUES (?, ?)";
+            int order = getNumberOfSongsInList(playlistId) + 1;
+            String sqlInsert = "INSERT INTO songs_in_playlist (playlistId, songId, [order]) VALUES (?, ?, ?)";
             PreparedStatement pstmtInsert = con.prepareStatement(sqlInsert);
             pstmtInsert.setInt(1, playlistId);
             pstmtInsert.setInt(2, songId);
+            pstmtInsert.setInt(3, order);
             pstmtInsert.executeUpdate();
 
         } catch (SQLException ex) {
             throw new RuntimeException(ex);
         }
     }
-
-    private void showAlert(String title, String message) {
-        Alert alert = new Alert(Alert.AlertType.WARNING);
-        alert.setTitle(title);
-        alert.setContentText(message);
-        alert.showAndWait();
-    }
-
 
     public void deletePlaylist(Playlist playlist) {
         try (Connection con = cm.getConnection()) {
@@ -219,15 +202,20 @@ public class DALManager {
         }
     }
 
-    public boolean deleteFromPlaylist(Song song, Playlist playlist) {
+    public void deleteFromPlaylist(Song song, Playlist playlist) {
         try (Connection con = cm.getConnection()) {
-            String sqlcommandInsert = "DELETE FROM songs_in_playlist WHERE songId = ? AND playlistId = ? AND [order] = ?";
-            PreparedStatement pstmtSelect = con.prepareStatement(sqlcommandInsert);
-            pstmtSelect.setInt(1, song.getId());
-            pstmtSelect.setInt(2, playlist.getId());
-            pstmtSelect.setInt(3, song.getOrder());
-            pstmtSelect.execute();
-            return true;
+            String sqlDelete = "DELETE FROM songs_in_playlist WHERE songId = ? AND playlistId = ? AND [order] = ?";
+            PreparedStatement pstmtDelete = con.prepareStatement(sqlDelete);
+            pstmtDelete.setInt(1, song.getId());
+            pstmtDelete.setInt(2, playlist.getId());
+            pstmtDelete.setInt(3, song.getOrder());
+            pstmtDelete.execute();
+
+            String sqlUpdateOrder = "UPDATE songs_in_playlist SET [order] = [order] - 1 WHERE playlistId = ? AND [order] > ?";
+            PreparedStatement pstmtUpdateOrder = con.prepareStatement(sqlUpdateOrder);
+            pstmtUpdateOrder.setInt(1, playlist.getId());
+            pstmtUpdateOrder.setInt(2, song.getOrder());
+            pstmtUpdateOrder.executeUpdate();
         } catch (SQLException ex) {
             throw new RuntimeException(ex);
         }
