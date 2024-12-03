@@ -105,7 +105,7 @@ public class BLLManager {
         currentSong = song;
 
         if (!Files.exists(path)) {
-            throw new Exception("Path to song does not exist on your PC.");
+            //throw new Exception("Path to song does not exist on your PC.");
         } else {
             Media media = new Media(new File(filePath).toURI().toString());
             mediaPlayer = new MediaPlayer(media);
