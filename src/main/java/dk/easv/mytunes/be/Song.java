@@ -52,8 +52,8 @@ public class Song {
 
     public String getDuration(){ return duration.get(); }
 
-    public void setDuration(String duration){
-        this.duration.set(duration);
+    public void setDuration(Time duration){
+        this.duration.set(String.valueOf(duration));
     }
 
     public String getFilePath(){

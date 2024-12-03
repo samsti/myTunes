@@ -17,21 +17,15 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
-import javafx.scene.media.MediaException;
 import javafx.scene.media.MediaPlayer;
 import javafx.stage.Stage;
 
-import javafx.scene.media.Media;
-
-import java.io.File;
 import java.net.URL;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.sql.Time;
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 import java.util.ResourceBundle;
 
 public class MainController implements Initializable {
@@ -191,10 +185,9 @@ public class MainController implements Initializable {
     }
     @FXML
     private void btnChooseCategoryClicked(ActionEvent event) {
-        btnChoose.setVisible(false);
+        btnChooseCategory.setVisible(false);
         txtNewCategory.setVisible(true);
-        btnChoose.setVisible(false);
-        btnAddCategory.setVisible(true);
+        btnAddCategory.setVisible(false);
     }
     @FXML
     private void btnCancelSongClicked(ActionEvent event) {
@@ -392,18 +385,25 @@ public class MainController implements Initializable {
     }
     @FXML
     private void btnSaveSongClicked(ActionEvent event) {
-        Song songToEdit = tblSongs.getSelectionModel().getSelectedItem();
-        if (songToEdit != null) {
-            songToEdit.setTitle(txtSongTitle.getText().trim());
-            songToEdit.setArtist(txtSongArtist.getText().trim());
-            songToEdit.setFilePath(txtFilePath.getText().trim());
-            songToEdit.setDuration(txtTime.getText().trim());
-            songToEdit.setCategory(choiceCategory.getSelectionModel().getSelectedItem().getId());
-            if (manager.editSong(songToEdit))
+        int songId = -1;
+            String title = txtSongTitle.getText().trim();
+            String artist = txtSongArtist.getText().trim();
+            String filePath = txtFilePath.getText().trim();
+            Time duration = checkValidTime(txtTime.getText().trim());
+
+            int category;
+        if (txtNewCategory.getText().isEmpty())
+            category = choiceCategory.getSelectionModel().getSelectedItem().getId();
+        else {
+            category = createNewCategory(txtNewCategory.getText().trim());
+        }
+            if (!title.isEmpty() && !artist.isEmpty() && !filePath.isEmpty() && category > 0) {
+                songId = model.addSong(title, artist, filePath, duration, category);
+            }
+            if (songId != -1)
                 closeSongsPopUp();
         }
 
-    }
     @FXML
     private void btnSaveSongClickedEdit(ActionEvent event) {
         Song songToEdit = tblSongs.getSelectionModel().getSelectedItem();
@@ -411,8 +411,12 @@ public class MainController implements Initializable {
             songToEdit.setTitle(txtSongTitle.getText().trim());
             songToEdit.setArtist(txtSongArtist.getText().trim());
             songToEdit.setFilePath(txtFilePath.getText().trim());
-            songToEdit.setDuration(txtTime.getText().trim());
-            songToEdit.setCategory(choiceCategory.getSelectionModel().getSelectedItem().getId());
+            songToEdit.setDuration(checkValidTime(txtTime.getText().trim()));
+            if (txtNewCategory.getText().isEmpty())
+                songToEdit.setCategory(choiceCategory.getSelectionModel().getSelectedItem().getId());
+            else {
+                songToEdit.setCategory(createNewCategory(txtNewCategory.getText().trim()));
+            }
             if (manager.editSong(songToEdit))
                 closeSongsPopUp();
         }
@@ -507,4 +511,46 @@ public class MainController implements Initializable {
         model.loadSongsOnPlaylist(playlistId);
         lstSongsInPlaylist.setItems(model.getSongsOnPlaylist());
     }
+
+    /**
+     * Checking
+     */
+    private Time checkValidTime(String time) {
+        if (time == null || time.isEmpty()) {
+            throw new RuntimeException("Invalid time format: Input is null or empty.");
+        }
+
+        String timePattern = "^([01]?\\d|2[0-3]):[0-5]\\d(:[0-5]\\d(\\.\\d{1,7})?)?$";
+        String shortTimePattern = "^[0-5]?\\d:[0-5]\\d$"; // m:ss
+        if (!time.matches(timePattern) && !time.matches(shortTimePattern)) {
+            throw  new RuntimeException("Invalid time format: Does not match TIME pattern.");
+        }
+
+        try {
+            LocalTime parsedTime;
+
+            if (time.matches(shortTimePattern)) {
+                // Convert m:ss to HH:mm:ss by assuming hours = 0
+                String[] parts = time.split(":");
+                int minutes = Integer.parseInt(parts[0]);
+                int seconds = Integer.parseInt(parts[1]);
+                parsedTime = LocalTime.of(0, minutes, seconds);
+            } else {
+                // Parse HH:mm:ss or HH:mm directly
+                parsedTime = LocalTime.parse(time);
+            }
+            // Format the parsed time as HH:mm:ss
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm:ss");
+            String formattedTime = parsedTime.format(formatter);
+            // Return as SQL Time
+            return Time.valueOf(formattedTime);
+        } catch (Exception e) {
+            throw new RuntimeException("Invalid time format: Parsing failed.", e);
+        }
+    }
+
+    private int createNewCategory(String name) {
+        return model.createNewCategory(name);
+    }
+
 }

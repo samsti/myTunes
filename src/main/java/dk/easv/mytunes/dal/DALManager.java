@@ -6,10 +6,7 @@ import dk.easv.mytunes.be.Song;
 import dk.easv.mytunes.exceptions.DBException;
 import javafx.scene.control.Alert;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -322,4 +319,43 @@ public class DALManager {
         return 0;
     }
 
+    public int addNewSong(String title, String artist, Time duration, String filePath, int category) {
+        try (Connection con = cm.getConnection()) {
+            int newId = 0;
+            String sqlcommandInsert = "INSERT INTO songs (title, artist, duration, file_path, category)\n" +
+                    "OUTPUT INSERTED.ID\n" +
+                    "VALUES (?, ?, ?, ?, ?);";
+            PreparedStatement pstmtSelect = con.prepareStatement(sqlcommandInsert);
+            pstmtSelect.setString(1, title);
+            pstmtSelect.setString(2, artist);
+            pstmtSelect.setTime(3, duration);
+            pstmtSelect.setString(4, filePath);
+            pstmtSelect.setInt(5, category);
+            ResultSet rs = pstmtSelect.executeQuery();
+            if (rs.next()) {
+                newId = rs.getInt(1);
+            }
+            return newId;
+        } catch (SQLException ex) {
+            throw new RuntimeException(ex);
+        }
+    }
+
+    public int createNewCategory(String name) {
+        try (Connection con = cm.getConnection()) {
+            int newId = 0;
+            String sqlcommandInsert = "INSERT INTO category (category)\n" +
+                    "OUTPUT INSERTED.ID\n" +
+                    "VALUES (?);";
+            PreparedStatement pstmtSelect = con.prepareStatement(sqlcommandInsert);
+            pstmtSelect.setString(1, name);
+            ResultSet rs = pstmtSelect.executeQuery();
+            if (rs.next()) {
+                newId = rs.getInt(1);
+            }
+            return newId;
+        } catch (SQLException ex) {
+            throw new RuntimeException(ex);
+        }
+    }
 }
