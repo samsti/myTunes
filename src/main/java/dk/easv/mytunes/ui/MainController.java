@@ -17,6 +17,7 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
+import javafx.scene.media.MediaException;
 import javafx.scene.media.MediaPlayer;
 import javafx.stage.Stage;
 
@@ -28,6 +29,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.sql.Time;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.ResourceBundle;
@@ -257,7 +259,7 @@ public class MainController implements Initializable {
 
     }
     @FXML
-    private void btnPlayClicked(ActionEvent event) {
+    private void btnPlayClicked(ActionEvent event) throws Exception {
         try {
             Song songToPlay = tblSongs.getSelectionModel().getSelectedItem();
             if (songToPlay == null) {
@@ -266,9 +268,11 @@ public class MainController implements Initializable {
             }
 
             manager.playSong(songToPlay);
-            lblPlaying.setText(songToPlay.getTitle());
+            lblPlaying.setText("Playing: " + songToPlay.getTitle());
+
         } catch (Exception e) {
-            e.printStackTrace();
+            Song nextSong = manager.getCurrentSong();
+            lblPlaying.setText(nextSong.getTitle() + " - path not found");
         }
     }
 
@@ -283,14 +287,51 @@ public class MainController implements Initializable {
     }
 
     @FXML
-    private void btnPlayNextClicked(ActionEvent event) throws Exception {
+    private void btnPlayNextClicked(ActionEvent event) {
+        try {
+            ObservableList<Song> observableList = tblSongs.getItems();
+            List<Song> songList = new ArrayList<>(observableList);
+            Song currentSong = manager.getCurrentSong();
+            Song nextSong = manager.findNextSong(songList, currentSong);
 
+            if (nextSong != null) {
+                manager.playSong(nextSong);
+                lblPlaying.setText("Now playing: " + nextSong.getTitle());
+            } else {
+                lblPlaying.setText("No next song available");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            lblPlaying.setText(manager.getCurrentSongTitle() + " - path not found");
+            MediaPlayer player = manager.getMediaPlayer();
+            player.stop();
+        }
     }
+
 
     @FXML
     private void btnPlayPreviousClicked(ActionEvent event) {
+        try {
+            ObservableList<Song> observableList = tblSongs.getItems();
+            List<Song> songList = new ArrayList<>(observableList);
 
+            Song currentSong = manager.getCurrentSong();
+
+            Song previousSong = manager.findPreviousSong(songList, currentSong);
+
+            if (previousSong != null) {
+                manager.playSong(previousSong);
+                lblPlaying.setText("Now playing: " + previousSong.getTitle());
+            } else {
+                lblPlaying.setText("No previous song available.");
+            }
+        } catch (Exception e) {
+            lblPlaying.setText(manager.getCurrentSongTitle() + " - path not found");
+            MediaPlayer player = manager.getMediaPlayer();
+            player.stop();
+        }
     }
+
 
     @FXML
     private void setVolume(MouseEvent event) {
