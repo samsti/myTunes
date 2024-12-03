@@ -17,6 +17,7 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
+import javafx.scene.media.MediaException;
 import javafx.scene.media.MediaPlayer;
 import javafx.stage.Stage;
 
@@ -24,7 +25,13 @@ import javafx.scene.media.Media;
 
 import java.io.File;
 import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.sql.Time;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
 import java.util.ResourceBundle;
 
 public class MainController implements Initializable {
@@ -81,6 +88,8 @@ public class MainController implements Initializable {
     @FXML private Slider sldVolume;
     @FXML private Button btnSavePlaylist;
     @FXML private Label lblPlaying;
+    @FXML private Button btnNext;
+    @FXML private Button btnBack;
     private final static String DELETING_DEFAULT_TEXT = "Are you sure you want to delete ";
     private BLLManager manager;
     private MediaPlayer mediaPlayer;
@@ -270,59 +279,79 @@ public class MainController implements Initializable {
 
 
     @FXML
-    private void btnPlayClicked(ActionEvent event) {
+    private void btnPlayClicked(ActionEvent event) throws Exception {
         try {
-            if (mediaPlayer != null) {
-                if (mediaPlayer.getStatus() == MediaPlayer.Status.PLAYING) {
-                    mediaPlayer.pause();
-                    Song songToPlay = tblSongs.getSelectionModel().getSelectedItem();
-                    String path = songToPlay.getFilePath();
-                    Media media = new Media(new File(path).toURI().toString());
-                    mediaPlayer = new MediaPlayer(media);
-                    lblPlaying.setText(songToPlay.getTitle());
-                    mediaPlayer.play();
-                    isPaused = true;
-                    return;
-                }
-                else if (mediaPlayer.getStatus() == MediaPlayer.Status.PAUSED) {
-                    mediaPlayer.play();
-                    isPaused = false;
-                    return;
-                }
-                else {
-                    lblPlaying.setText("Something went wrong");
-                }
+            Song songToPlay = tblSongs.getSelectionModel().getSelectedItem();
+            if (songToPlay == null) {
+                lblPlaying.setText("No song selected.");
+                return;
             }
 
-            try {
-                Song songToPlay = tblSongs.getSelectionModel().getSelectedItem();
-                if (songToPlay != null) {
-                    String path = songToPlay.getFilePath();
-                    if (path != null) {
-                    Media media = new Media(new File(path).toURI().toString());
-                    mediaPlayer = new MediaPlayer(media);
-                    lblPlaying.setText(songToPlay.getTitle());
+            manager.playSong(songToPlay);
+            lblPlaying.setText("Playing: " + songToPlay.getTitle());
 
-                    mediaPlayer.play();
-                    isPaused = false;
-                    }
-                }
-            }
-            catch (Exception e) {
-                e.printStackTrace();
-            }
+        } catch (Exception e) {
+            Song nextSong = manager.getCurrentSong();
+            lblPlaying.setText(nextSong.getTitle() + " - path not found");
+        }
+    }
 
+    @FXML
+    private void btnStopClicked(ActionEvent event) {
+        try {
+            manager.stopSong();
+            isPaused = false;
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
+
     @FXML
-    private void btnStopClicked(ActionEvent event) {
-        if (mediaPlayer != null && mediaPlayer.getStatus() == MediaPlayer.Status.PLAYING) {
-            mediaPlayer.pause();
-            isPaused = true;
+    private void btnPlayNextClicked(ActionEvent event) {
+        try {
+            ObservableList<Song> observableList = tblSongs.getItems();
+            List<Song> songList = new ArrayList<>(observableList);
+            Song currentSong = manager.getCurrentSong();
+            Song nextSong = manager.findNextSong(songList, currentSong);
+
+            if (nextSong != null) {
+                manager.playSong(nextSong);
+                lblPlaying.setText("Now playing: " + nextSong.getTitle());
+            } else {
+                lblPlaying.setText("No next song available");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            lblPlaying.setText(manager.getCurrentSongTitle() + " - path not found");
+            MediaPlayer player = manager.getMediaPlayer();
+            player.stop();
         }
     }
+
+
+    @FXML
+    private void btnPlayPreviousClicked(ActionEvent event) {
+        try {
+            ObservableList<Song> observableList = tblSongs.getItems();
+            List<Song> songList = new ArrayList<>(observableList);
+
+            Song currentSong = manager.getCurrentSong();
+
+            Song previousSong = manager.findPreviousSong(songList, currentSong);
+
+            if (previousSong != null) {
+                manager.playSong(previousSong);
+                lblPlaying.setText("Now playing: " + previousSong.getTitle());
+            } else {
+                lblPlaying.setText("No previous song available.");
+            }
+        } catch (Exception e) {
+            lblPlaying.setText(manager.getCurrentSongTitle() + " - path not found");
+            MediaPlayer player = manager.getMediaPlayer();
+            player.stop();
+        }
+    }
+
 
     @FXML
     private void setVolume(MouseEvent event) {
