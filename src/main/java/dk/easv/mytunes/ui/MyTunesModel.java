@@ -83,7 +83,7 @@ public class MyTunesModel {
     }
     public void deleteSong(Song selectedSong, boolean deleteFile) {
         if (selectedSong != null) {
-            if (manager.deletSong(selectedSong, deleteFile))
+            if (manager.deleteSong(selectedSong, deleteFile))
                 songs.remove(selectedSong);
             else
                 throw new RuntimeException(deleteFile ?

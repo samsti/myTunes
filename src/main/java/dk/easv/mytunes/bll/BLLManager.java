@@ -7,6 +7,7 @@ import dk.easv.mytunes.dal.ChooseFile;
 import dk.easv.mytunes.dal.DALManager;
 import dk.easv.mytunes.dal.FileManager;
 import dk.easv.mytunes.exceptions.DBException;
+import dk.easv.mytunes.ui.MainController;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
 import javafx.stage.Window;
@@ -25,6 +26,9 @@ public class BLLManager {
     private double volume = 0.5;
     private MediaPlayer mediaPlayer;
     private Song currentSong;
+    private Song currentSongInPlaylist;
+    private Playlist currentPlaylist;
+    private MainController mainController;
 
 
     public List<Song> getAllSongs() throws DBException {
@@ -43,9 +47,15 @@ public class BLLManager {
         return currentSong;
     }
 
+    public Song getCurrentSongInPlaylist(Playlist playlist) throws DBException {
+        return currentSongInPlaylist;
+    }
+
+
     public String getCurrentSongTitle() throws DBException {
         return currentSong.getTitle();
     }
+
 
     public MediaPlayer getMediaPlayer() {
         return mediaPlayer;
@@ -65,6 +75,22 @@ public class BLLManager {
         return null;
     }
 
+    public Song findNextSongInPlaylist(Playlist playlist, Song currentSong) {
+        if (currentSong == null) {
+            throw new IllegalArgumentException("Current song is null.");
+        }
+
+        List<Song> playlistSongs = mainController.getSongsInPlaylist();
+
+        int currentIndex = playlistSongs.indexOf(currentSong);
+
+        if (currentIndex != -1 && currentIndex < playlistSongs.size() - 1) {
+            return playlistSongs.get(currentIndex + 1); // Return the next song
+        }
+
+        return null;
+    }
+
     public Song findPreviousSong(List<Song> songList, Song currentSong) {
         if (currentSong == null) {
             throw new IllegalArgumentException("Current song is null.");
@@ -74,6 +100,20 @@ public class BLLManager {
 
         if (currentIndex > 0) {
             return songList.get(currentIndex - 1);
+        }
+
+        return null;
+    }
+
+    public Playlist findPreviousSongInPlaylist(List<Playlist> playlistList, Song currentSong) {
+        if (currentSong == null) {
+            throw new IllegalArgumentException("Current song is null.");
+        }
+
+        int currentIndex = playlistList.indexOf(currentSong);
+
+        if (currentIndex > 0) {
+            return playlistList.get(currentIndex - 1);
         }
 
         return null;
@@ -115,16 +155,46 @@ public class BLLManager {
         }
     }
 
+    public void playSongInPlaylist(Song song, Playlist playlist) throws Exception {
+        if (song == null || playlist == null) {
+            throw new IllegalArgumentException("Song or Playlist cannot be null");
+        }
+
+        List<Song> playlistSongs = mainController.getSongsInPlaylist();
+        if (!playlistSongs.contains(song)) {
+            throw new IllegalArgumentException("The song is not in the provided playlist.");
+        }
+
+        playSong(song);
+
+        currentPlaylist = playlist;
+
+        mediaPlayer.setOnEndOfMedia(() -> {
+            try {
+                // Find the next song in the playlist
+                int currentIndex = playlistSongs.indexOf(song);
+                int nextIndex = currentIndex + 1;
+
+                if (nextIndex < playlistSongs.size()) {
+                    Song nextSong = playlistSongs.get(nextIndex);
+                    playSongInPlaylist(nextSong, playlist);
+                } else {
+                    System.out.println("Reached the end of the playlist.");
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        });
+
+    }
+
+
     public void stopSong() throws Exception {
         if (mediaPlayer != null && mediaPlayer.getStatus() == MediaPlayer.Status.PLAYING) {
             mediaPlayer.pause();
         }
     }
 
-
-    public void playPreviousSong() throws Exception {
-
-    }
 
     public void setVolume(double volume) {
         if(volume < 0.0 || volume > 100.0) {
@@ -137,13 +207,6 @@ public class BLLManager {
         return volume;
     }
 
-    public boolean isPlaying() {
-        if (mediaPlayer.getStatus() == MediaPlayer.Status.PLAYING) {
-            System.out.println("playing");
-            return true;
-        }
-        return false;
-    }
 
     public String openFile(Window window) {
         ChooseFile fileBrowser = new ChooseFile(window);
@@ -178,7 +241,7 @@ public class BLLManager {
     public boolean deleteFromPlaylist(Song selectedSongInPlaylist, Playlist selectedPlaylist) {
         return dalManager.deleteFromPlaylist(selectedSongInPlaylist, selectedPlaylist);
     }
-    public boolean deletSong(Song selectedSong, boolean deleteFile) {
+    public boolean deleteSong(Song selectedSong, boolean deleteFile) {
         if (dalManager.deleteSong(selectedSong)) {
             if (deleteFile) {
                 FileManager fileManager = new FileManager();
