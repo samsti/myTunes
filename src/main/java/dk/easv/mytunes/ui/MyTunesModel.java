@@ -113,4 +113,8 @@ public class MyTunesModel {
         songs.add(newSong);
         return songId;
     }
+
+    public int createNewCategory(String name) {
+        return manager.createNewCategory(name);
+    }
 }

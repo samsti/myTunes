@@ -340,4 +340,22 @@ public class DALManager {
             throw new RuntimeException(ex);
         }
     }
+
+    public int createNewCategory(String name) {
+        try (Connection con = cm.getConnection()) {
+            int newId = 0;
+            String sqlcommandInsert = "INSERT INTO category (category)\n" +
+                    "OUTPUT INSERTED.ID\n" +
+                    "VALUES (?);";
+            PreparedStatement pstmtSelect = con.prepareStatement(sqlcommandInsert);
+            pstmtSelect.setString(1, name);
+            ResultSet rs = pstmtSelect.executeQuery();
+            if (rs.next()) {
+                newId = rs.getInt(1);
+            }
+            return newId;
+        } catch (SQLException ex) {
+            throw new RuntimeException(ex);
+        }
+    }
 }

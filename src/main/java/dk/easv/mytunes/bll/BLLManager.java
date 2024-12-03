@@ -204,4 +204,8 @@ public class BLLManager {
     public int addSong(String title, String artist, String filePath, Time duration, int category) {
         return dalManager.addNewSong (title, artist, duration, filePath, category);
     }
+
+    public int createNewCategory(String name) {
+        return dalManager.createNewCategory(name);
+    }
 }

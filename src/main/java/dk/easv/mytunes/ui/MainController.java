@@ -185,10 +185,9 @@ public class MainController implements Initializable {
     }
     @FXML
     private void btnChooseCategoryClicked(ActionEvent event) {
-        btnChoose.setVisible(false);
+        btnChooseCategory.setVisible(false);
         txtNewCategory.setVisible(true);
-        btnChoose.setVisible(false);
-        btnAddCategory.setVisible(true);
+        btnAddCategory.setVisible(false);
     }
     @FXML
     private void btnCancelSongClicked(ActionEvent event) {
@@ -391,7 +390,13 @@ public class MainController implements Initializable {
             String artist = txtSongArtist.getText().trim();
             String filePath = txtFilePath.getText().trim();
             Time duration = checkValidTime(txtTime.getText().trim());
-            int category = choiceCategory.getSelectionModel().getSelectedItem().getId();
+
+            int category;
+        if (txtNewCategory.getText().isEmpty())
+            category = choiceCategory.getSelectionModel().getSelectedItem().getId();
+        else {
+            category = createNewCategory(txtNewCategory.getText().trim());
+        }
             if (!title.isEmpty() && !artist.isEmpty() && !filePath.isEmpty() && category > 0) {
                 songId = model.addSong(title, artist, filePath, duration, category);
             }
@@ -407,7 +412,11 @@ public class MainController implements Initializable {
             songToEdit.setArtist(txtSongArtist.getText().trim());
             songToEdit.setFilePath(txtFilePath.getText().trim());
             songToEdit.setDuration(checkValidTime(txtTime.getText().trim()));
-            songToEdit.setCategory(choiceCategory.getSelectionModel().getSelectedItem().getId());
+            if (txtNewCategory.getText().isEmpty())
+                songToEdit.setCategory(choiceCategory.getSelectionModel().getSelectedItem().getId());
+            else {
+                songToEdit.setCategory(createNewCategory(txtNewCategory.getText().trim()));
+            }
             if (manager.editSong(songToEdit))
                 closeSongsPopUp();
         }
@@ -538,6 +547,10 @@ public class MainController implements Initializable {
         } catch (Exception e) {
             throw new RuntimeException("Invalid time format: Parsing failed.", e);
         }
+    }
+
+    private int createNewCategory(String name) {
+        return model.createNewCategory(name);
     }
 
 }
