@@ -4,7 +4,6 @@ import dk.easv.mytunes.be.Category;
 import dk.easv.mytunes.be.Playlist;
 import dk.easv.mytunes.be.Song;
 import dk.easv.mytunes.exceptions.DBException;
-import javafx.scene.control.Alert;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -23,11 +22,16 @@ public class DALManager {
     }
 
     public List<Song> getAllSongs() {
-        List<Song> songs = new ArrayList();
+        List<Song> songs = new ArrayList<>();
         try (Connection con = cm.getConnection()) {
-            String sqlcommandSelect = "SELECT * FROM songs";
-            PreparedStatement pstmtSelect = con.prepareStatement(sqlcommandSelect);
-            ResultSet rs = pstmtSelect.executeQuery();
+            String sqlCommand = """
+            SELECT s.id, s.title, s.artist, s.duration, s.file_path, s.category, c.category AS category_name
+            FROM songs s
+            JOIN category c ON s.category = c.id;
+        """;
+            PreparedStatement pstmt = con.prepareStatement(sqlCommand);
+            ResultSet rs = pstmt.executeQuery();
+
             while (rs.next()) {
                 songs.add(new Song(
                         rs.getInt("id"),
@@ -35,14 +39,16 @@ public class DALManager {
                         rs.getString("artist"),
                         rs.getTime("duration"),
                         rs.getString("file_path"),
-                        rs.getInt("category"))
-                );
+                        rs.getInt("category"),
+                        rs.getString("category_name")
+                ));
             }
         } catch (SQLException ex) {
             throw new RuntimeException(ex);
         }
         return songs;
     }
+
 
     public List<Song> getFilteredSongs(String filter) {
         List<Song> filteredSongs = new ArrayList();
@@ -59,7 +65,7 @@ public class DALManager {
                         rs.getString("artist"),
                         rs.getTime("duration"),
                         rs.getString("file_path"),
-                        rs.getInt("category"))
+                        rs.getInt("category"), rs.getString("category_name"))
                 );
             }
         } catch (SQLException ex) {
@@ -137,7 +143,7 @@ public class DALManager {
                         rs.getString("artist"),
                         rs.getTime("duration"),
                         rs.getString("file_path"),
-                        rs.getInt("category"));
+                        rs.getInt("category"), rs.getString("category_name"));
                 toAdd.setOrder(rs.getInt("order"));
                 songsOnPlaylist.add(toAdd);
             }

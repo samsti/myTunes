@@ -111,6 +111,7 @@ public class MainController implements Initializable {
     private void loadSongs() {
         titleColumn.setCellValueFactory(cellData -> cellData.getValue().titleProperty());
         artistColumn.setCellValueFactory(cellData -> cellData.getValue().artistProperty());
+        categoryColumn.setCellValueFactory(cellData -> cellData.getValue().categoryNameProperty());
         durationColumn.setCellValueFactory(cellData -> cellData.getValue().durationProperty());
         columnName.setCellValueFactory(new PropertyValueFactory<>("name"));
         columnTotalDuration.setCellValueFactory(new PropertyValueFactory<>("totalDuration"));
