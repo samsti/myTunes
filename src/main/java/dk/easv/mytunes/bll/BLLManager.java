@@ -15,6 +15,7 @@ import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.sql.Time;
 import java.util.List;
 
 
@@ -198,5 +199,9 @@ public class BLLManager {
 
     public void addSongToPlaylist(int playlistId, int songId) {
         dalManager.addSongToPlaylist(playlistId, songId);
+    }
+
+    public int addSong(String title, String artist, String filePath, Time duration, int category) {
+        return dalManager.addNewSong (title, artist, duration, filePath, category);
     }
 }

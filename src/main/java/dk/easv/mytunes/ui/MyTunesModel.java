@@ -8,6 +8,7 @@ import dk.easv.mytunes.exceptions.DBException;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
+import java.sql.Time;
 import java.util.List;
 
 public class MyTunesModel {
@@ -103,5 +104,13 @@ public class MyTunesModel {
                         "Song and/or file could not be deleted" : "Song could not be deleted from database");
         } else
             throw new RuntimeException("No song is selected");
+    }
+
+    public int addSong(String title, String artist, String filePath, Time duration, int category) {
+        int songId;
+        songId = manager.addSong(title, artist, filePath, duration, category);
+        Song newSong = new Song(songId, title, artist, duration, filePath, category);
+        songs.add(newSong);
+        return songId;
     }
 }
