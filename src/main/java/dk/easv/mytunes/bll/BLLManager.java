@@ -26,7 +26,6 @@ public class BLLManager {
     private MediaPlayer mediaPlayer;
     private Song currentSong;
 
-
     public List<Song> getAllSongs() throws DBException {
         return dalManager.getAllSongs();
     }
@@ -98,14 +97,14 @@ public class BLLManager {
                 return;
             } else {
                 mediaPlayer.stop();
-                mediaPlayer.dispose();
+                //mediaPlayer.dispose();
             }
         }
 
         currentSong = song;
 
         if (!Files.exists(path)) {
-            //throw new Exception("Path to song does not exist on your PC.");
+            throw new DBException("Song does not exist.");
         } else {
             Media media = new Media(new File(filePath).toURI().toString());
             mediaPlayer = new MediaPlayer(media);
@@ -113,7 +112,6 @@ public class BLLManager {
             mediaPlayer.play();
 
             mediaPlayer.setOnEndOfMedia(() -> {
-                System.out.println("Song finished playing.");
                 mediaPlayer.stop();
             });
         }
@@ -126,10 +124,6 @@ public class BLLManager {
     }
 
 
-    public void playPreviousSong() throws Exception {
-
-    }
-
     public void setVolume(double volume) {
         if(volume < 0.0 || volume > 100.0) {
             throw new IllegalArgumentException("Volume must be between 0.0 and 1.0");
@@ -139,14 +133,6 @@ public class BLLManager {
     }
     public double getVolume() {
         return volume;
-    }
-
-    public boolean isPlaying() {
-        if (mediaPlayer.getStatus() == MediaPlayer.Status.PLAYING) {
-            System.out.println("playing");
-            return true;
-        }
-        return false;
     }
 
     public String openFile(Window window) {
