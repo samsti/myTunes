@@ -91,10 +91,12 @@ public class MyTunesModel {
     }
 
     public void deleteFromPlaylist(Song selectedSongInPlaylist, Playlist selectedPlaylist) {
-        if (selectedSongInPlaylist != null && selectedPlaylist != null)
-            if (manager.deleteFromPlaylist(selectedSongInPlaylist, selectedPlaylist))
-                songsOnPlaylist.remove(selectedSongInPlaylist);
+        if (selectedSongInPlaylist != null && selectedPlaylist != null) {
+            manager.deleteFromPlaylist(selectedSongInPlaylist, selectedPlaylist);
+            songsOnPlaylist.remove(selectedSongInPlaylist);
+        }
     }
+
     public void deleteSong(Song selectedSong, boolean deleteFile) {
         if (selectedSong != null) {
             if (manager.deletSong(selectedSong, deleteFile))

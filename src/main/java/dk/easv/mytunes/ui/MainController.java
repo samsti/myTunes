@@ -218,6 +218,7 @@ public class MainController implements Initializable {
         model.deleteFromPlaylist(songToDelete, getSelectedPlaylist());
         closeDeleteWindow();
     }
+
     @FXML
     private void btnDeleteSongClicked(ActionEvent event) {
         if (tblSongs.getSelectionModel().getSelectedItem() != null) {
