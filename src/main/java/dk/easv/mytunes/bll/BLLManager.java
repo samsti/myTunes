@@ -160,33 +160,37 @@ public class BLLManager {
             throw new IllegalArgumentException("Song or Playlist cannot be null");
         }
 
-        List<Song> playlistSongs = mainController.getSongsInPlaylist();
-        if (!playlistSongs.contains(song)) {
-            throw new IllegalArgumentException("The song is not in the provided playlist.");
+        String filePath = song.getFilePath();
+        Path path = Paths.get(filePath);
+
+        if (mediaPlayer != null && Files.exists(path)) {
+            if (mediaPlayer.getStatus() == MediaPlayer.Status.PAUSED) {
+                mediaPlayer.play();
+                return;
+            } else {
+                mediaPlayer.stop();
+                mediaPlayer.dispose();
+            }
         }
 
-        playSong(song);
+        currentSong = song;
 
-        currentPlaylist = playlist;
+        if (!Files.exists(path)) {
+            throw new Exception("Path to song does not exist on your PC.");
+        } else {
+            Media media = new Media(new File(filePath).toURI().toString());
+            mediaPlayer = new MediaPlayer(media);
+            mediaPlayer.setVolume(volume);
+            mediaPlayer.play();
 
-        mediaPlayer.setOnEndOfMedia(() -> {
-            try {
-                // Find the next song in the playlist
-                int currentIndex = playlistSongs.indexOf(song);
-                int nextIndex = currentIndex + 1;
-
-                if (nextIndex < playlistSongs.size()) {
-                    Song nextSong = playlistSongs.get(nextIndex);
-                    playSongInPlaylist(nextSong, playlist);
-                } else {
-                    System.out.println("Reached the end of the playlist.");
-                }
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        });
-
+            mediaPlayer.setOnEndOfMedia(() -> {
+                System.out.println("Song finished playing.");
+                mediaPlayer.stop();
+            });
+        }
     }
+
+
 
 
     public void stopSong() throws Exception {

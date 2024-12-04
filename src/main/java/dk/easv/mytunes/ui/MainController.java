@@ -85,6 +85,7 @@ public class MainController implements Initializable {
     private BLLManager manager;
     private MediaPlayer mediaPlayer;
     private boolean isPaused = false;
+    private Song nextSong;
 
 
     @Override
@@ -102,6 +103,30 @@ public class MainController implements Initializable {
                 manager.setVolume(volume/100); //Passes the new volume to the Business Layer
             }
         });
+
+        tblPlaylist.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
+            if (newValue != null) {
+                tblSongs.getSelectionModel().clearSelection();
+            }
+        });
+
+        tblSongs.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
+            if (newValue != null) {
+                tblPlaylist.getSelectionModel().clearSelection();
+
+            }
+        });
+
+        /*
+
+        lstSongsInPlaylist.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
+            if (newValue != null) {
+                tblSongs.getSelectionModel().clearSelection();
+            }
+        });
+
+         */
+
     }
 
     private void loadSongs() {
@@ -251,28 +276,50 @@ public class MainController implements Initializable {
 
     }
     @FXML
-    private void btnPlayClicked(ActionEvent event) throws Exception {
+    private void btnPlayClicked(ActionEvent event) {
+        Song nextSong = null;
+
         try {
-            Song songToPlay = tblSongs.getSelectionModel().getSelectedItem();
-            Song playlistSong = lstSongsInPlaylist.getSelectionModel().getSelectedItem();
-            Playlist playlistToPlay = getSelectedPlaylist();
+            if (getSelectedSong() != null && getSelectedPlaylist() == null) {
+                Song songToPlay = tblSongs.getSelectionModel().getSelectedItem();
 
+                if (songToPlay == null) {
+                    lblPlaying.setText("No song selected");
+                    return;
+                }
 
-            if (songToPlay == null && playlistSong == null) {
-                lblPlaying.setText("No song selected");
-                return;
+                manager.playSong(songToPlay);
+                lblPlaying.setText("Playing: " + songToPlay.getTitle());
+                nextSong = manager.getCurrentSong();
             }
 
-            manager.playSong(songToPlay);
-            manager.playSongInPlaylist(playlistSong, playlistToPlay);
-            lblPlaying.setText("Playing: " + songToPlay.getTitle());
-            lblPlaying.setText("Playing " + playlistSong.getTitle());
+            // Handle songs from a selected playlist
+            if (getSelectedPlaylist() != null && getSelectedSongInPlaylist() != null) {
+                Playlist playlistToPlay = getSelectedPlaylist();
+                Song playlistSong = getSelectedSongInPlaylist();
 
+                if (playlistSong == null) {
+                    lblPlaying.setText("No song selected in playlist");
+                    return;
+                }
+
+                // Play the song from the playlist
+                manager.playSongInPlaylist(playlistSong, playlistToPlay);
+                lblPlaying.setText("Playing: " + playlistSong.getTitle() + " from playlist " + playlistToPlay.getName());
+                nextSong = manager.getCurrentSongInPlaylist(playlistToPlay);
+            }
         } catch (Exception e) {
-            Song nextSong = manager.getCurrentSong();
-           // lblPlaying.setText(nextSong.getTitle() + " - path not found");
+            e.printStackTrace();
+
+            // Provide a fallback message for the error
+            if (nextSong != null) {
+                lblPlaying.setText(nextSong.getTitle() + " - path not found");
+            } else {
+                lblPlaying.setText(nextSong.getTitle() + " - path not found");
+            }
         }
     }
+
 
     @FXML
     private void btnStopClicked(ActionEvent event) {
@@ -329,6 +376,7 @@ public class MainController implements Initializable {
             player.stop();
         }
     }
+
 
 
     @FXML
@@ -501,5 +549,9 @@ public class MainController implements Initializable {
 
     private Song getSelectedSongInPlaylist() {
         return lstSongsInPlaylist.getSelectionModel().getSelectedItem();
+    }
+
+    private Song setCurrentSelectedSongInPlaylist(Song song) {
+        return song;
     }
 }
