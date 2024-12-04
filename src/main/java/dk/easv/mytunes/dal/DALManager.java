@@ -143,7 +143,7 @@ public class DALManager {
                         rs.getString("artist"),
                         rs.getTime("duration"),
                         rs.getString("file_path"),
-                        rs.getInt("category"), rs.getString("category_name"));
+                        rs.getInt("category"));
                 toAdd.setOrder(rs.getInt("order"));
                 songsOnPlaylist.add(toAdd);
             }
