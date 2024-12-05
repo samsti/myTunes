@@ -155,9 +155,11 @@ public class DALManager {
 
     public Playlist createPlaylist(Playlist playlist) {
         try (Connection con = cm.getConnection()) {
-            String sqlcommandInsert = "INSERT INTO playlists (name) VALUES (?)";
+            String sqlcommandInsert = "INSERT INTO playlists (name, total_duration, number_of_songs) VALUES (?, ?, ?)";
             PreparedStatement pstmtSelect = con.prepareStatement(sqlcommandInsert);
             pstmtSelect.setString(1, playlist.getName());
+            pstmtSelect.setTime(2, Time.valueOf("00:00:00"));
+            pstmtSelect.setInt(3, 0);
             pstmtSelect.execute();
         } catch (SQLException ex) {
             throw new RuntimeException(ex);
@@ -350,6 +352,48 @@ public class DALManager {
             return newId;
         } catch (SQLException ex) {
             throw new RuntimeException(ex);
+        }
+    }
+
+    public int getNumberOfSongsInPlaylist(int playlistId) {
+        try (Connection con = cm.getConnection()) {
+            String sqlcommand = "SELECT COUNT(*) AS PlaylistCount\n" +
+                    "        FROM songs_in_playlist\n" +
+                    "        WHERE playlistId = ?;";
+            PreparedStatement statement = con.prepareStatement(sqlcommand);
+            statement.setInt(1, playlistId);
+            ResultSet rs = statement.executeQuery();
+            if (rs.next()) {
+                return rs.getInt("PlaylistCount");
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+        return 0;
+
+    }
+
+    public void updatePlaylistTime(Time totalTime, int id) {
+        try (Connection con = cm.getConnection()) {
+            String sqlcommand = "UPDATE playlists SET total_duration = ?WHERE id = ?";
+            PreparedStatement statement = con.prepareStatement(sqlcommand);
+            statement.setString(1, totalTime.toString());
+            statement.setInt(2, id);
+            statement.executeUpdate();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public void updateNumberOfSongs(int count, int id) {
+        try (Connection con = cm.getConnection()) {
+            String sqlcommand = "UPDATE playlists SET number_of_songs = ?WHERE id = ?";
+            PreparedStatement statement = con.prepareStatement(sqlcommand);
+            statement.setInt(1, count);
+            statement.setInt(2, id);
+            statement.executeUpdate();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
         }
     }
 }

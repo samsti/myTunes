@@ -47,10 +47,6 @@ public class BLLManager {
         return currentSong;
     }
 
-    public String getCurrentSongTitle() throws DBException {
-        return currentSong.getTitle();
-    }
-
     public MediaPlayer getMediaPlayer() {
         return mediaPlayer;
     }
@@ -193,5 +189,16 @@ public class BLLManager {
 
     public int createNewCategory(String name) {
         return dalManager.createNewCategory(name);
+    }
+
+    public int getNumberOfSongsInPLaylist(int playlistId) {
+        return dalManager.getNumberOfSongsInPlaylist(playlistId);
+    }
+
+    public void updatePlaylistTime(Time totalTime, int id) {
+        dalManager.updatePlaylistTime (totalTime, id);
+    }
+    public void updateTotalNumberOfSongs(int count, int id) {
+        dalManager.updateNumberOfSongs(count, id);
     }
 }
