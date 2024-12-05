@@ -119,4 +119,42 @@ public class MyTunesModel {
     public int createNewCategory(String name) {
         return manager.createNewCategory(name);
     }
+
+    public int getNumberOfSongsInPlaylist (int playlistId) {
+        int count = manager.getNumberOfSongsInPLaylist(playlistId);
+        for (Playlist playlist : playlists) {
+            if (playlist.getId() == playlistId) {
+                playlist.setNumberOfSongs(count);
+            }
+        }
+        manager.updateTotalNumberOfSongs(count, playlistId);
+        return count;
+    }
+    public Time getTotalPlaylistTime (int playlistId) {
+        Time totalTime;
+        int hour = 0;
+        int minute = 0;
+        int second = 0;
+        for (Song s : songsOnPlaylist) {
+            String duration = s.getDuration();
+            String[] parts = duration.split(":");
+            hour += Integer.parseInt(parts[0]);
+            minute += Integer.parseInt(parts[1]);
+            second += Integer.parseInt(parts[2]);
+        }
+        int minuteToAdd = second / 60;
+        second = second % 60;
+        minute += minuteToAdd;
+        int hourToAdd = minute / 60;
+        minute = minute % 60;
+        hour += hourToAdd;
+        totalTime = new Time(hour, minute, second);
+        for (Playlist playlist : playlists) {
+            if (playlist.getId() == playlistId) {
+                playlist.setTotalDuration(String.valueOf(totalTime));
+            }
+        }
+        manager.updatePlaylistTime(totalTime, playlistId);
+        return totalTime;
+    }
 }

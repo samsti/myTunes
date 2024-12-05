@@ -217,6 +217,10 @@ public class MainController implements Initializable {
     private void btnYesDeleteFromPlaylistClicked(ActionEvent event) {
         Song songToDelete = getSelectedSongInPlaylist();
         model.deleteFromPlaylist(songToDelete, getSelectedPlaylist());
+        int playlistId = getSelectedPlaylist().getId();
+        getSelectedPlaylist().setNumberOfSongs(model.getNumberOfSongsInPlaylist(playlistId));
+        getSelectedPlaylist().setTotalDuration(String.valueOf(model.getTotalPlaylistTime(playlistId)));
+        tblPlaylist.refresh();
         closeDeleteWindow();
     }
 
@@ -317,7 +321,7 @@ public class MainController implements Initializable {
             }
         } catch (Exception e) {
             e.printStackTrace();
-            lblPlaying.setText(manager.getCurrentSongTitle() + " - path not found");
+            //lblPlaying.setText(manager.getCurrentSongTitle() + " - path not found");
             MediaPlayer player = manager.getMediaPlayer();
             player.stop();
         }
@@ -341,7 +345,7 @@ public class MainController implements Initializable {
                 lblPlaying.setText("No previous song available.");
             }
         } catch (Exception e) {
-            lblPlaying.setText(manager.getCurrentSongTitle() + " - path not found");
+            //lblPlaying.setText(manager.getCurrentSongTitle() + " - path not found");
             MediaPlayer player = manager.getMediaPlayer();
             player.stop();
         }
@@ -511,6 +515,10 @@ public class MainController implements Initializable {
         int playlistId = getSelectedPlaylist().getId();
         model.addSongToPlaylist(playlistId, songId);
         model.loadSongsOnPlaylist(playlistId);
+        model.getTotalPlaylistTime(playlistId);
+        getSelectedPlaylist().setNumberOfSongs(model.getNumberOfSongsInPlaylist(playlistId));
+        getSelectedPlaylist().setTotalDuration(String.valueOf(model.getTotalPlaylistTime(playlistId)));
+        tblPlaylist.refresh();
         lstSongsInPlaylist.setItems(model.getSongsOnPlaylist());
     }
 
