@@ -144,8 +144,9 @@ public class MyTunesModel {
         }
         int minuteToAdd = second / 60;
         second = second % 60;
-        int hourToAdd = minuteToAdd / 60;
-        minute = minuteToAdd % 60;
+        minute += minuteToAdd;
+        int hourToAdd = minute / 60;
+        minute = minute % 60;
         hour += hourToAdd;
         totalTime = new Time(hour, minute, second);
         for (Playlist playlist : playlists) {
