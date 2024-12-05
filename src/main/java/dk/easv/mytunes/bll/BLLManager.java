@@ -16,6 +16,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.sql.Time;
+import java.util.ArrayList;
 import java.util.List;
 
 
@@ -26,6 +27,9 @@ public class BLLManager {
     private double volume = 0.5;
     private MediaPlayer mediaPlayer;
     private Song currentSong;
+    private Song currentSongInPlaylist;
+    private Playlist currentPlaylist;
+    private List<Song> playlistSongs;
 
     public List<Song> getAllSongs() throws DBException {
         return dalManager.getAllSongs();
@@ -55,9 +59,20 @@ public class BLLManager {
         if (currentSong == null) {
             throw new IllegalArgumentException("Current song is null.");
         }
-
-        int currentIndex = songList.indexOf(currentSong);
-
+        int currentIndex = -1;
+        if (!songList.equals(getAllSongs())) {
+            currentIndex = currentSong.getOrder() - 1;
+        }
+        else  {
+            for (int i = 0; i < songList.size(); i++) {
+                System.out.println("Comparing song ID: " + songList.get(i).getId() + " with current song ID: " + currentSong.getId());
+                if (songList.get(i).getId() == currentSong.getId()) {
+                    System.out.println("BLL found the ID: " + songList.get(i).getTitle());
+                    currentIndex = i;
+                    break;
+                }
+            }
+        }
         if (currentIndex != -1 && currentIndex < songList.size() - 1) {
             return songList.get(currentIndex + 1);
         }
@@ -66,11 +81,11 @@ public class BLLManager {
     }
 
     public Song findPreviousSong(List<Song> songList, Song currentSong) {
-        if (currentSong == null) {
+        if (this.currentSongInPlaylist == null) {
             throw new IllegalArgumentException("Current song is null.");
         }
 
-        int currentIndex = songList.indexOf(currentSong);
+        int currentIndex = currentSongInPlaylist.getOrder()-1;
 
         if (currentIndex > 0) {
             return songList.get(currentIndex - 1);
@@ -114,6 +129,49 @@ public class BLLManager {
         }
     }
 
+    public void playSongInPlaylist(Song song, Playlist playlist) throws Exception {
+        playlistSongs = new ArrayList<>(getAllSongs());
+        if (song == null && playlist == null) {
+            //throw new IllegalArgumentException("Song or Playlist cannot be null");
+            currentSongInPlaylist = playlistSongs.getFirst();
+        }
+        if (playlist != null) {
+            playlistSongs = new ArrayList<>(getSongsOnPlaylist(playlist.getId()));
+            currentSongInPlaylist = playlistSongs.getFirst();
+        }
+        if (song != null)
+            currentSongInPlaylist = song;
+        boolean songFound = playlistSongs.stream().anyMatch(playlistSong -> playlistSong.getId() == currentSongInPlaylist.getId());
+        if (!songFound) {
+            throw new IllegalArgumentException("The song is not in the provided playlist.");
+        }
+
+
+        playSong(currentSongInPlaylist);
+
+        currentPlaylist = playlist;
+
+        List<Song> finalPlaylistSongs = playlistSongs;
+        mediaPlayer.setOnEndOfMedia(() -> {
+            try {
+                /** Find the next song in the playlist
+                 int currentIndex = finalPlaylistSongs.indexOf(finalSong);
+                 int nextIndex = currentIndex + 1;
+
+                 if (nextIndex < finalPlaylistSongs.size()) {
+                 Song nextSong = finalPlaylistSongs.get(nextIndex);
+                 playSongInPlaylist(nextSong, playlist);
+                 } else {
+                 System.out.println("Reached the end of the playlist.");
+                 }*/
+                findNextSong(finalPlaylistSongs, currentSongInPlaylist);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        });
+
+    }
+
     public void stopSong() throws Exception {
         if (mediaPlayer != null && mediaPlayer.getStatus() == MediaPlayer.Status.PLAYING) {
             mediaPlayer.pause();
@@ -130,6 +188,14 @@ public class BLLManager {
     }
     public double getVolume() {
         return volume;
+    }
+
+    public String getCurrentSongTitle() throws DBException {
+        return currentSong.getTitle();
+    }
+
+    public Song getCurrentSongInPlaylist(Playlist playlist) throws DBException {
+        return currentSongInPlaylist;
     }
 
     public String openFile(Window window) {

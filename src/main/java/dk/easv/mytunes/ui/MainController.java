@@ -280,18 +280,28 @@ public class MainController implements Initializable {
     @FXML
     private void btnPlayClicked(ActionEvent event) throws Exception {
         try {
-            Song songToPlay = tblSongs.getSelectionModel().getSelectedItem();
-            if (songToPlay == null) {
-                lblPlaying.setText("No song selected.");
-                return;
+            Song songToPlay = getSelectedSong();
+            Song playlistSong = getSelectedSongInPlaylist();
+            Playlist playlistToPlay = getSelectedPlaylist();
+
+            if (songToPlay == null && playlistSong == null) {
+                //lblPlaying.setText("No song selected");
+                manager.playSongInPlaylist(null, null);
+            }
+            else if (playlistToPlay != null && playlistSong != null) {
+                manager.playSongInPlaylist(playlistSong, playlistToPlay);
+            }
+            else if (songToPlay != null) {
+                manager.playSongInPlaylist(songToPlay, null);
             }
 
-            manager.playSong(songToPlay);
-            lblPlaying.setText("Playing: " + songToPlay.getTitle());
+            //manager.playSongInPlaylist(songToPlay, null);
+            //manager.playSongInPlaylist(playlistSong, playlistToPlay);
+            lblPlaying.setText("Playing: " + manager.getCurrentSongTitle());
 
         } catch (Exception e) {
             Song nextSong = manager.getCurrentSong();
-            lblPlaying.setText(nextSong.getTitle() + " - path not found");
+            // lblPlaying.setText(nextSong.getTitle() + " - path not found");
         }
     }
 
@@ -307,21 +317,33 @@ public class MainController implements Initializable {
 
     @FXML
     private void btnPlayNextClicked(ActionEvent event) {
-        try {
-            ObservableList<Song> observableList = tblSongs.getItems();
-            List<Song> songList = new ArrayList<>(observableList);
-            Song currentSong = manager.getCurrentSong();
-            Song nextSong = manager.findNextSong(songList, currentSong);
+        List<Song> songList;
+        Song nextSong = null;
 
-            if (nextSong != null) {
-                manager.playSong(nextSong);
+        try {
+            if (getSelectedPlaylist() != null)
+                songList = new ArrayList<>(manager.getSongsOnPlaylist(getSelectedPlaylist().getId()));
+            else
+                songList = manager.getAllSongs();
+            Song currentSong = manager.getCurrentSong();
+            Song currentSongInPlaylist = manager.getCurrentSongInPlaylist(getSelectedPlaylist());
+            Playlist currentPlaylist = getSelectedPlaylist();
+            nextSong = manager.findNextSong(songList, currentSong);
+            int selectedBefore = lstSongsInPlaylist.getSelectionModel().getSelectedIndex();
+            if (nextSong != null && currentSongInPlaylist != null) {
+                manager.playSongInPlaylist(nextSong, currentPlaylist);
+                setCurrentSelectedSong(nextSong);
                 lblPlaying.setText("Now playing: " + nextSong.getTitle());
-            } else {
+                lstSongsInPlaylist.getSelectionModel().select(selectedBefore+1);
+            }
+            else {
                 lblPlaying.setText("No next song available");
             }
+
         } catch (Exception e) {
             e.printStackTrace();
-            //lblPlaying.setText(manager.getCurrentSongTitle() + " - path not found");
+            lblPlaying.setText(manager.getCurrentSongTitle() + " - path not found");
+            setCurrentSelectedSong(nextSong);
             MediaPlayer player = manager.getMediaPlayer();
             player.stop();
         }
@@ -330,25 +352,42 @@ public class MainController implements Initializable {
 
     @FXML
     private void btnPlayPreviousClicked(ActionEvent event) {
+        List<Song> songList = null;
+        Song previousSong = null;
         try {
-            ObservableList<Song> observableList = tblSongs.getItems();
-            List<Song> songList = new ArrayList<>(observableList);
-
+            if (getSelectedPlaylist() != null)
+                songList = new ArrayList<>(manager.getSongsOnPlaylist(getSelectedPlaylist().getId()));
+            else
+                songList = manager.getAllSongs();
             Song currentSong = manager.getCurrentSong();
-
-            Song previousSong = manager.findPreviousSong(songList, currentSong);
-
-            if (previousSong != null) {
-                manager.playSong(previousSong);
+            Song currentSongInPlaylist = manager.getCurrentSongInPlaylist(getSelectedPlaylist());
+            Playlist currentPlaylist = getSelectedPlaylist();
+            previousSong = manager.findPreviousSong(songList, currentSong);
+            int selectedBefore = lstSongsInPlaylist.getSelectionModel().getSelectedIndex();
+            if (previousSong != null && currentSongInPlaylist != null) {
+                manager.playSongInPlaylist(previousSong, currentPlaylist);
+                setCurrentSelectedSong(previousSong);
                 lblPlaying.setText("Now playing: " + previousSong.getTitle());
-            } else {
-                lblPlaying.setText("No previous song available.");
+                lstSongsInPlaylist.getSelectionModel().select(selectedBefore-1);
+            }
+            else {
+                lblPlaying.setText("No previous song available");
             }
         } catch (Exception e) {
-            //lblPlaying.setText(manager.getCurrentSongTitle() + " - path not found");
+            lblPlaying.setText(manager.getCurrentSongTitle() + " - path not found");
             MediaPlayer player = manager.getMediaPlayer();
+            setCurrentSelectedSong(previousSong);
             player.stop();
         }
+    }
+
+    private void setCurrentSelectedSong(Song song) {
+        List<Song> songList;
+        ObservableList<Song> observableList = tblSongs.getItems();
+        songList = new ArrayList<>(observableList);
+        int index = songList.indexOf(song);
+        tblSongs.getSelectionModel().select(index);
+        tblSongs.scrollTo(index);
     }
 
 
