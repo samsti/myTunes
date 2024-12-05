@@ -294,14 +294,10 @@ public class MainController implements Initializable {
             else if (songToPlay != null) {
                 manager.playSongInPlaylist(songToPlay, null);
             }
-
-            //manager.playSongInPlaylist(songToPlay, null);
-            //manager.playSongInPlaylist(playlistSong, playlistToPlay);
-            lblPlaying.setText("Playing: " + manager.getCurrentSongTitle());
-
+            lblPlaying.textProperty().bind(manager.currentSongTitleProperty());
         } catch (Exception e) {
             Song nextSong = manager.getCurrentSong();
-            // lblPlaying.setText(nextSong.getTitle() + " - path not found");
+            lblPlaying.setText(nextSong.getTitle() + " - path not found");
         }
     }
 
@@ -547,6 +543,10 @@ public class MainController implements Initializable {
 
     private Song getSelectedSongInPlaylist() {
         return lstSongsInPlaylist.getSelectionModel().getSelectedItem();
+    }
+
+    public void setLabelForSong(Song song) {
+        lblPlaying.setText("Playing: " + song.getTitle());
     }
 
     public void addSongToPlaylist(ActionEvent actionEvent) {

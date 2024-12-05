@@ -7,6 +7,9 @@ import dk.easv.mytunes.dal.ChooseFile;
 import dk.easv.mytunes.dal.DALManager;
 import dk.easv.mytunes.dal.FileManager;
 import dk.easv.mytunes.exceptions.DBException;
+import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleObjectProperty;
+import javafx.beans.property.StringProperty;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
 import javafx.stage.Window;
@@ -28,6 +31,7 @@ public class BLLManager {
     private MediaPlayer mediaPlayer;
     private Song currentSong;
     private Song currentSongInPlaylist;
+    private ObjectProperty<String> currentSongTitleProperty = new SimpleObjectProperty<>();
     private Playlist currentPlaylist;
     private List<Song> playlistSongs;
 
@@ -94,6 +98,13 @@ public class BLLManager {
         return null;
     }
 
+    public void setCurrentSongTitle(String title) {
+        this.currentSongTitleProperty.set(title);
+    }
+
+    public ObjectProperty<String> currentSongTitleProperty() {
+        return currentSongTitleProperty;
+    }
 
     public void playSong(Song song) throws Exception {
         if (song == null) {
@@ -114,6 +125,8 @@ public class BLLManager {
         }
 
         currentSong = song;
+        setCurrentSongTitle("Playing: " + song.getTitle());
+
 
         if (!Files.exists(path)) {
             throw new DBException("Song does not exist.");
@@ -148,6 +161,7 @@ public class BLLManager {
 
 
         playSong(currentSongInPlaylist);
+
 
         currentPlaylist = playlist;
 
