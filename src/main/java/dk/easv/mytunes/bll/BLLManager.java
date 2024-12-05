@@ -16,6 +16,7 @@ import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.List;
 
 
@@ -76,7 +77,7 @@ public class BLLManager {
     }
 
     public Song findNextSongInPlaylist(Playlist playlist, Song currentSong) {
-        if (currentSong == null) {
+        if (currentSong == null && playlist == null) {
             throw new IllegalArgumentException("Current song is null.");
         }
 
@@ -85,7 +86,7 @@ public class BLLManager {
         int currentIndex = playlistSongs.indexOf(currentSong);
 
         if (currentIndex != -1 && currentIndex < playlistSongs.size() - 1) {
-            return playlistSongs.get(currentIndex + 1); // Return the next song
+            return playlistSongs.get(currentIndex + 1);
         }
 
         return null;
@@ -156,9 +157,12 @@ public class BLLManager {
     }
 
     public void playSongInPlaylist(Song song, Playlist playlist) throws Exception {
-        if (song == null || playlist == null) {
+        if (song == null && playlist == null) {
             throw new IllegalArgumentException("Song or Playlist cannot be null");
         }
+
+        List<Song> playlistSongs = new ArrayList<>(getSongsOnPlaylist(playlist.getId()));
+
 
         String filePath = song.getFilePath();
         Path path = Paths.get(filePath);
@@ -173,11 +177,12 @@ public class BLLManager {
             }
         }
 
-        currentSong = song;
+        currentSongInPlaylist = song;
 
         if (!Files.exists(path)) {
-            throw new Exception("Path to song does not exist on your PC.");
-        } else {
+            throw new Exception("No path found");
+        }
+        else {
             Media media = new Media(new File(filePath).toURI().toString());
             mediaPlayer = new MediaPlayer(media);
             mediaPlayer.setVolume(volume);

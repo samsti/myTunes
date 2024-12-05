@@ -117,16 +117,6 @@ public class MainController implements Initializable {
             }
         });
 
-        /*
-
-        lstSongsInPlaylist.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
-            if (newValue != null) {
-                tblSongs.getSelectionModel().clearSelection();
-            }
-        });
-
-         */
-
     }
 
     private void loadSongs() {
@@ -290,10 +280,8 @@ public class MainController implements Initializable {
 
                 manager.playSong(songToPlay);
                 lblPlaying.setText("Playing: " + songToPlay.getTitle());
-                nextSong = manager.getCurrentSong();
             }
 
-            // Handle songs from a selected playlist
             if (getSelectedPlaylist() != null && getSelectedSongInPlaylist() != null) {
                 Playlist playlistToPlay = getSelectedPlaylist();
                 Song playlistSong = getSelectedSongInPlaylist();
@@ -303,18 +291,18 @@ public class MainController implements Initializable {
                     return;
                 }
 
-                // Play the song from the playlist
                 manager.playSongInPlaylist(playlistSong, playlistToPlay);
                 lblPlaying.setText("Playing: " + playlistSong.getTitle() + " from playlist " + playlistToPlay.getName());
-                nextSong = manager.getCurrentSongInPlaylist(playlistToPlay);
             }
         } catch (Exception e) {
             e.printStackTrace();
 
-            // Provide a fallback message for the error
-            if (nextSong != null) {
+            if (getSelectedSong() != null && getSelectedPlaylist() == null) {
+                nextSong = manager.getCurrentSong();
                 lblPlaying.setText(nextSong.getTitle() + " - path not found");
-            } else {
+            } if(getSelectedPlaylist() != null && getSelectedSongInPlaylist() != null) {
+                Playlist playlistToPlay = getSelectedPlaylist();
+                nextSong = manager.getCurrentSongInPlaylist(playlistToPlay);
                 lblPlaying.setText(nextSong.getTitle() + " - path not found");
             }
         }
@@ -351,22 +339,31 @@ public class MainController implements Initializable {
         Song nextSong = null;
 
         try {
-            ObservableList<Song> observableList = tblSongs.getItems();
-            songList = new ArrayList<>(observableList);
-            Song currentSong = manager.getCurrentSong();
             Song currentSongInPlaylist = manager.getCurrentSongInPlaylist(getSelectedPlaylist());
             Playlist currentPlaylist = getSelectedPlaylist();
-            nextSong = manager.findNextSong(songList, currentSong);
 
-            if (nextSong != null && currentSongInPlaylist == null) {
+            if (currentSongInPlaylist == null || currentPlaylist == null) {
+                ObservableList<Song> observableList = tblSongs.getItems();
+                songList = new ArrayList<>(observableList);
+                Song currentSong = manager.getCurrentSong();
+                nextSong = manager.findNextSong(songList, currentSong);
+
+
                 manager.playSong(nextSong);
                 setCurrentSelectedSong(nextSong);
                 lblPlaying.setText("Now playing: " + nextSong.getTitle());
+            }
 
-            }
-            else {
-                lblPlaying.setText("No next song available");
-            }
+
+           if (nextSong != null && currentPlaylist != null) {
+
+               Song currentSong = manager.getCurrentSong();
+               nextSong = manager.findNextSongInPlaylist(currentPlaylist, currentSong);
+               manager.playSongInPlaylist(nextSong, currentPlaylist);
+               setCurrentSelectedSong(nextSong);
+               lblPlaying.setText("Now playing: " + nextSong.getTitle() + "in Playlist: " + currentPlaylist.getName()) ;
+
+           }
 
         } catch (Exception e) {
             e.printStackTrace();
