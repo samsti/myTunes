@@ -164,7 +164,8 @@ public class BLLManager {
                  } else {
                  System.out.println("Reached the end of the playlist.");
                  }*/
-                findNextSong(finalPlaylistSongs, currentSongInPlaylist);
+                Song nextSong = findNextSong(finalPlaylistSongs, currentSongInPlaylist);
+                playSongInPlaylist(nextSong, currentPlaylist);
             } catch (Exception e) {
                 e.printStackTrace();
             }
