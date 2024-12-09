@@ -297,43 +297,40 @@ public class MainController implements Initializable {
     @FXML
     private void btnPlayClicked(ActionEvent event) {
         Song nextSong = null;
-
         try {
-            if (getSelectedSong() != null && getSelectedPlaylist() == null) {
-                Song songToPlay = tblSongs.getSelectionModel().getSelectedItem();
+            Song songToPlay = getSelectedSong();
+            if (manager.checkPathExists(songToPlay)) {
+                if (getSelectedPlaylist() == null) {
 
-                if (songToPlay == null) {
-                    lblPlaying.setText("No song selected");
-                    return;
+                    lblPlaying.setText("Playing: " + songToPlay.getTitle());
+                    manager.playSong(songToPlay);
+
+                } else {
+                    lblPlaying.setText(nextSong.getTitle() + " - kokot");
                 }
 
-                manager.playSong(songToPlay);
-                lblPlaying.setText("Playing: " + songToPlay.getTitle());
-            }
+                if (getSelectedPlaylist() != null && getSelectedSongInPlaylist() != null) {
+                    Playlist playlistToPlay = getSelectedPlaylist();
+                    Song playlistSong = getSelectedSongInPlaylist();
 
-            if (getSelectedPlaylist() != null && getSelectedSongInPlaylist() != null) {
-                Playlist playlistToPlay = getSelectedPlaylist();
-                Song playlistSong = getSelectedSongInPlaylist();
+                    if (playlistSong == null) {
+                        lblPlaying.setText("No song selected in playlist");
+                        return;
+                    }
 
-                if (playlistSong == null) {
-                    lblPlaying.setText("No song selected in playlist");
-                    return;
+                    manager.playSongInPlaylist(playlistSong, playlistToPlay);
+                    lblPlaying.setText("Playing: " + playlistSong.getTitle() + " from playlist " + playlistToPlay.getName());
                 }
-
-                manager.playSongInPlaylist(playlistSong, playlistToPlay);
-                lblPlaying.setText("Playing: " + playlistSong.getTitle() + " from playlist " + playlistToPlay.getName());
             }
-        } catch (Exception e) {
+            else {
+                manager.setCurrentSong(songToPlay);
+                lblPlaying.setText(songToPlay.getTitle() + " - Path not found");
+            }
+
+        }
+        catch (Exception e) {
             e.printStackTrace();
 
-            if (getSelectedSong() != null && getSelectedPlaylist() == null) {
-                nextSong = manager.getCurrentSong();
-                lblPlaying.setText(nextSong.getTitle() + " - path not found");
-            } if(getSelectedPlaylist() != null && getSelectedSongInPlaylist() != null) {
-                Playlist playlistToPlay = getSelectedPlaylist();
-                nextSong = manager.getCurrentSongInPlaylist(playlistToPlay);
-                lblPlaying.setText(nextSong.getTitle() + " - path not found");
-            }
         }
     }
 
@@ -364,72 +361,120 @@ public class MainController implements Initializable {
 
     @FXML
     private void btnPlayNextClicked(ActionEvent event) {
-        List<Song> songList = null;
-        Song nextSong = null;
-
         try {
-            Song currentSongInPlaylist = manager.getCurrentSongInPlaylist(getSelectedPlaylist());
             Playlist currentPlaylist = getSelectedPlaylist();
+            Song currentSong = manager.getCurrentSong();
+            Song nextSong = null;
 
-            if (currentSongInPlaylist == null || currentPlaylist == null) {
+            // Case 1: No Playlist Selected (Using Table Songs)
+            if (currentPlaylist == null) {
                 ObservableList<Song> observableList = tblSongs.getItems();
-                songList = new ArrayList<>(observableList);
-                Song currentSong = manager.getCurrentSong();
+                List<Song> songList = new ArrayList<>(observableList);
                 nextSong = manager.findNextSong(songList, currentSong);
 
-
-                manager.playSong(nextSong);
-                setCurrentSelectedSong(nextSong);
-                lblPlaying.setText("Now playing: " + nextSong.getTitle());
+                if (nextSong != null && manager.checkPathExists(nextSong)) {
+                    manager.playSong(nextSong);
+                    lblPlaying.setText("Now playing: " + nextSong.getTitle());
+                    setCurrentSelectedSong(nextSong); // Update selected song
+                } else {
+                    lblPlaying.setText(nextSong != null ?
+                            nextSong.getTitle() + " - Path not found" :
+                            "No more songs in the list.");
+                    //manager.getMediaPlayer().stop();
+                }
             }
 
+            // Case 2: Playlist Selected
+            else {
+                nextSong = manager.findNextSongInPlaylist(currentPlaylist, currentSong);
 
-           if (nextSong != null && currentPlaylist != null) {
+                if (nextSong != null && manager.checkPathExists(nextSong)) {
+                    manager.playSongInPlaylist(nextSong, currentPlaylist);
+                    lblPlaying.setText("Now playing: " + nextSong.getTitle() +
+                            " in Playlist: " + currentPlaylist.getName());
+                    setCurrentSelectedSong(nextSong); // Update selected song
+                } else {
+                    lblPlaying.setText(nextSong != null ?
+                            nextSong.getTitle() + " - Path not found" :
+                            "No more songs in the playlist.");
 
-               Song currentSong = manager.getCurrentSong();
-               nextSong = manager.findNextSongInPlaylist(currentPlaylist, currentSong);
-               manager.playSongInPlaylist(nextSong, currentPlaylist);
-               setCurrentSelectedSong(nextSong);
-               lblPlaying.setText("Now playing: " + nextSong.getTitle() + "in Playlist: " + currentPlaylist.getName()) ;
+                }
+            }
 
-           }
+            // Update `currentSong`
+            if (nextSong != null) {
+                manager.setCurrentSong(nextSong); // Ensure the BLL tracks the current song
+            }
 
         } catch (Exception e) {
             e.printStackTrace();
-            lblPlaying.setText(manager.getCurrentSongTitle() + " - path not found");
+            lblPlaying.setText("An error occurred while playing the next song.");
             MediaPlayer player = manager.getMediaPlayer();
-            player.stop();
+            if (player != null) player.stop();
         }
     }
+
 
 
 
     @FXML
     private void btnPlayPreviousClicked(ActionEvent event) {
-        List<Song> songList = null;
-        Song previousSong = null;
         try {
-            ObservableList<Song> observableList = tblSongs.getItems();
-            songList = new ArrayList<>(observableList);
-
+            Playlist currentPlaylist = getSelectedPlaylist();
             Song currentSong = manager.getCurrentSong();
+            Song previousSong = null;
 
-            previousSong = manager.findPreviousSong(songList, currentSong);
 
-            if (previousSong != null) {
-                manager.playSong(previousSong);
-                lblPlaying.setText("Now playing: " + previousSong.getTitle());
-                setCurrentSelectedSong(previousSong);
-            } else {
-                lblPlaying.setText("No previous song available.");
+            // Case 1: No Playlist Selected (Using Table Songs)
+            if (currentPlaylist == null) {
+                ObservableList<Song> observableList = tblSongs.getItems();
+                List<Song> songList = new ArrayList<>(observableList);
+                previousSong = manager.findPreviousSong(songList, currentSong);
+
+                if (previousSong != null && manager.checkPathExists(previousSong)) {
+                    manager.playSong(previousSong);
+                    lblPlaying.setText("Now playing: " + previousSong.getTitle());
+                    setCurrentSelectedSong(previousSong); // Update selected song
+                } else {
+                    lblPlaying.setText(previousSong != null ?
+                            previousSong.getTitle() + " - Path not found" :
+                            "No previous song available in the list.");
+                    //manager.getMediaPlayer().stop();
+                }
             }
+
+            // Case 2: Playlist Selected
+            else {
+                List<Song> songList = getSongsInPlaylist();
+
+
+                previousSong = manager.findPreviousSongInPlaylist(getSongsInPlaylist(), currentSong);
+
+                if (previousSong != null && manager.checkPathExists(previousSong)) {
+                    manager.playSongInPlaylist(previousSong, currentPlaylist);
+                    lblPlaying.setText("Now playing: " + previousSong.getTitle() +
+                            " in Playlist: " + currentPlaylist.getName());
+                    setCurrentSelectedSong(previousSong); // Update selected song
+                } else {
+                    lblPlaying.setText(previousSong != null ?
+                            previousSong.getTitle() + " - Path not found" :
+                            "No previous song available in the playlist.");
+                }
+            }
+
+            // Update `currentSong`
+            if (previousSong != null) {
+                manager.setCurrentSong(previousSong); // Ensure the BLL tracks the current song
+            }
+
         } catch (Exception e) {
-            lblPlaying.setText(manager.getCurrentSongTitle() + " - path not found");
+            e.printStackTrace();
+            lblPlaying.setText("An error occurred while playing the previous song.");
             MediaPlayer player = manager.getMediaPlayer();
-            setCurrentSelectedSong(previousSong);
-            player.stop();
+            if (player != null) player.stop();
         }
     }
+
 
 
     @FXML

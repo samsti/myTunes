@@ -59,6 +59,10 @@ public class BLLManager {
         return currentSong;
     }
 
+    public Song setCurrentSong(Song song) throws DBException {
+        return currentSong = song;
+    }
+
     public Song getCurrentSongInPlaylist(Playlist playlist) throws DBException {
         return currentSongInPlaylist;
     }
@@ -80,12 +84,15 @@ public class BLLManager {
 
         int currentIndex = songList.indexOf(currentSong);
 
+        // Handle case where the song is not in the list or is the last song
         if (currentIndex != -1 && currentIndex < songList.size() - 1) {
             return songList.get(currentIndex + 1);
+
         }
 
         return null;
     }
+
 
     public Song findNextSongInPlaylist(Playlist playlist, Song currentSong) {
         if (currentSong == null && playlist == null) {
@@ -117,19 +124,20 @@ public class BLLManager {
         return null;
     }
 
-    public Playlist findPreviousSongInPlaylist(List<Playlist> playlistList, Song currentSong) {
+    public Song findPreviousSongInPlaylist(List<Song> songList, Song currentSong) {
         if (currentSong == null) {
             throw new IllegalArgumentException("Current song is null.");
         }
 
-        int currentIndex = playlistList.indexOf(currentSong);
+        int currentIndex = songList.indexOf(currentSong);
 
         if (currentIndex > 0) {
-            return playlistList.get(currentIndex - 1);
+            return songList.get(currentIndex - 1); // Get the previous song
         }
 
-        return null;
+        return null; // No previous song
     }
+
 
     public void setCurrentSongTitle(String title) {
         this.currentSongTitleProperty.set(title);
@@ -144,26 +152,27 @@ public class BLLManager {
             throw new IllegalArgumentException("No song provided.");
         }
 
-        String filePath = song.getFilePath();
-        Path path = Paths.get(filePath);
+        currentSong = song;
+        System.out.println(currentSong.getTitle());
 
-        if (mediaPlayer != null && Files.exists(path)) {
+
+        if (mediaPlayer != null && checkPathExists(song)) {
             if (mediaPlayer.getStatus() == MediaPlayer.Status.PAUSED) {
                 mediaPlayer.play();
                 return;
             } else {
                 mediaPlayer.stop();
-                //mediaPlayer.dispose();
+                mediaPlayer.dispose();
             }
         }
 
-        currentSong = song;
-        setCurrentSongTitle("Playing: " + song.getTitle());
 
 
-        if (!Files.exists(path)) {
-            throw new DBException("Song does not exist.");
-        } else {
+
+        String filePath = song.getFilePath();
+
+        // Check if the song file path exists
+        if (checkPathExists(song)) {
             Media media = new Media(new File(filePath).toURI().toString());
             mediaPlayer = new MediaPlayer(media);
             mediaPlayer.setVolume(volume);
@@ -175,18 +184,15 @@ public class BLLManager {
         }
     }
 
+
     public void playSongInPlaylist(Song song, Playlist playlist) throws Exception {
         if (song == null && playlist == null) {
             throw new IllegalArgumentException("Song or Playlist cannot be null");
         }
 
-        List<Song> playlistSongs = new ArrayList<>(getSongsOnPlaylist(playlist.getId()));
+        //List<Song> playlistSongs = new ArrayList<>(getSongsOnPlaylist(playlist.getId()));
 
-
-        String filePath = song.getFilePath();
-        Path path = Paths.get(filePath);
-
-        if (mediaPlayer != null && Files.exists(path)) {
+        if (mediaPlayer != null && checkPathExists(song)) {
             if (mediaPlayer.getStatus() == MediaPlayer.Status.PAUSED) {
                 mediaPlayer.play();
                 return;
@@ -198,10 +204,9 @@ public class BLLManager {
 
         currentSongInPlaylist = song;
 
-        if (!Files.exists(path)) {
-            throw new Exception("No path found");
-        }
-        else {
+        String filePath = song.getFilePath();
+
+        if (checkPathExists(song)) {
             Media media = new Media(new File(filePath).toURI().toString());
             mediaPlayer = new MediaPlayer(media);
             mediaPlayer.setVolume(volume);
@@ -305,5 +310,18 @@ public class BLLManager {
     }
     public void updateTotalNumberOfSongs(int count, int id) {
         dalManager.updateNumberOfSongs(count, id);
+    }
+
+    public boolean checkPathExists(Song song) {
+
+        String filePath = song.getFilePath();
+        Path path = Paths.get(filePath);
+
+        if (Files.exists(path)){
+            return true;
+        }
+        else {
+            return false;
+        }
     }
 }
