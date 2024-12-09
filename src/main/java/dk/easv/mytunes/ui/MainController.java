@@ -22,6 +22,8 @@ import javafx.stage.Stage;
 
 import java.net.URL;
 import java.sql.Time;
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.ResourceBundle;
@@ -29,6 +31,7 @@ import java.util.ResourceBundle;
 public class MainController implements Initializable {
 
 
+    @FXML private Button btnFilter;
     @FXML private StackPane rootPane;
     @FXML private Button btnPlay;
     @FXML private Button btnStop;
@@ -86,6 +89,7 @@ public class MainController implements Initializable {
     private MediaPlayer mediaPlayer;
     private boolean isPaused = false;
     private Song nextSong;
+    private boolean isFilterMode = true;
 
 
     @Override
@@ -95,7 +99,7 @@ public class MainController implements Initializable {
         popupBg.setPrefHeight(rootPane.getHeight());
         loadSongs();
 
-//        // Adds a listener to any slider changes
+       // Adds a listener to any slider changes
         volumeSlider.valueProperty().addListener(new ChangeListener<Number>() {
             @Override
             public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
@@ -124,6 +128,7 @@ public class MainController implements Initializable {
     private void loadSongs() {
         titleColumn.setCellValueFactory(cellData -> cellData.getValue().titleProperty());
         artistColumn.setCellValueFactory(cellData -> cellData.getValue().artistProperty());
+        categoryColumn.setCellValueFactory(cellData -> cellData.getValue().categoryNameProperty());
         durationColumn.setCellValueFactory(cellData -> cellData.getValue().durationProperty());
         columnName.setCellValueFactory(new PropertyValueFactory<>("name"));
         columnTotalDuration.setCellValueFactory(new PropertyValueFactory<>("totalDuration"));
@@ -198,10 +203,9 @@ public class MainController implements Initializable {
     }
     @FXML
     private void btnChooseCategoryClicked(ActionEvent event) {
-        btnChoose.setVisible(false);
+        btnChooseCategory.setVisible(false);
         txtNewCategory.setVisible(true);
-        btnChoose.setVisible(false);
-        btnAddCategory.setVisible(true);
+        btnAddCategory.setVisible(false);
     }
     @FXML
     private void btnCancelSongClicked(ActionEvent event) {
@@ -230,8 +234,13 @@ public class MainController implements Initializable {
     private void btnYesDeleteFromPlaylistClicked(ActionEvent event) {
         Song songToDelete = getSelectedSongInPlaylist();
         model.deleteFromPlaylist(songToDelete, getSelectedPlaylist());
+        int playlistId = getSelectedPlaylist().getId();
+        getSelectedPlaylist().setNumberOfSongs(model.getNumberOfSongsInPlaylist(playlistId));
+        getSelectedPlaylist().setTotalDuration(String.valueOf(model.getTotalPlaylistTime(playlistId)));
+        tblPlaylist.refresh();
         closeDeleteWindow();
     }
+
     @FXML
     private void btnDeleteSongClicked(ActionEvent event) {
         if (tblSongs.getSelectionModel().getSelectedItem() != null) {
@@ -265,8 +274,26 @@ public class MainController implements Initializable {
     }
     @FXML
     private void searchSongs(ActionEvent event) {
+        String textFilter = txtFilter.getText().trim();
 
+        if(isFilterMode) {
+            if (textFilter.isBlank()) {
+                System.out.println("Blank");
+            } else {
+                model.loadFilteredSongs(textFilter);
+                tblSongs.setItems(model.getFilteredSongs());
+                btnFilter.setText("Clear");
+                isFilterMode = false;
+            }
+        } else {
+            txtFilter.setText("");
+            btnFilter.setText("Filter");
+            loadSongs();
+            isFilterMode = true;
+        }
     }
+
+
     @FXML
     private void btnPlayClicked(ActionEvent event) {
         Song nextSong = null;
@@ -370,7 +397,6 @@ public class MainController implements Initializable {
         } catch (Exception e) {
             e.printStackTrace();
             lblPlaying.setText(manager.getCurrentSongTitle() + " - path not found");
-            setCurrentSelectedSong(nextSong);
             MediaPlayer player = manager.getMediaPlayer();
             player.stop();
         }
@@ -405,6 +431,7 @@ public class MainController implements Initializable {
         }
     }
 
+
     @FXML
     private void setVolume(MouseEvent event) {
         mediaPlayer.setVolume(manager.getVolume());
@@ -438,22 +465,31 @@ public class MainController implements Initializable {
             txtTime.setText(songToEdit.getDuration());
             choiceCategory.setValue(manager.returnCategoryName(songToEdit.getCategory()));
         }
+        else {
+            throw new RuntimeException("No song selected");
+        }
     }
     @FXML
     private void btnSaveSongClicked(ActionEvent event) {
-        Song songToEdit = tblSongs.getSelectionModel().getSelectedItem();
-        if (songToEdit != null) {
-            songToEdit.setTitle(txtSongTitle.getText().trim());
-            songToEdit.setArtist(txtSongArtist.getText().trim());
-            songToEdit.setFilePath(txtFilePath.getText().trim());
-            songToEdit.setDuration(txtTime.getText().trim());
-            songToEdit.setCategory(choiceCategory.getSelectionModel().getSelectedItem().getId());
-            if (manager.editSong(songToEdit))
+        int songId = -1;
+            String title = txtSongTitle.getText().trim();
+            String artist = txtSongArtist.getText().trim();
+            String filePath = txtFilePath.getText().trim();
+            Time duration = checkValidTime(txtTime.getText().trim());
+
+            int category;
+        if (txtNewCategory.getText().isEmpty())
+            category = choiceCategory.getSelectionModel().getSelectedItem().getId();
+        else {
+            category = createNewCategory(txtNewCategory.getText().trim());
+        }
+            if (!title.isEmpty() && !artist.isEmpty() && !filePath.isEmpty() && category > 0) {
+                songId = model.addSong(title, artist, filePath, duration, category);
+            }
+            if (songId != -1)
                 closeSongsPopUp();
         }
-        else
-            throw new RuntimeException("No song selected");
-    }
+
     @FXML
     private void btnSaveSongClickedEdit(ActionEvent event) {
         Song songToEdit = tblSongs.getSelectionModel().getSelectedItem();
@@ -461,8 +497,12 @@ public class MainController implements Initializable {
             songToEdit.setTitle(txtSongTitle.getText().trim());
             songToEdit.setArtist(txtSongArtist.getText().trim());
             songToEdit.setFilePath(txtFilePath.getText().trim());
-            songToEdit.setDuration(txtTime.getText().trim());
-            songToEdit.setCategory(choiceCategory.getSelectionModel().getSelectedItem().getId());
+            songToEdit.setDuration(checkValidTime(txtTime.getText().trim()));
+            if (txtNewCategory.getText().isEmpty())
+                songToEdit.setCategory(choiceCategory.getSelectionModel().getSelectedItem().getId());
+            else {
+                songToEdit.setCategory(createNewCategory(txtNewCategory.getText().trim()));
+            }
             if (manager.editSong(songToEdit))
                 closeSongsPopUp();
         }
@@ -550,7 +590,61 @@ public class MainController implements Initializable {
         return lstSongsInPlaylist.getSelectionModel().getSelectedItem();
     }
 
-    private Song setCurrentSelectedSongInPlaylist(Song song) {
-        return song;
+    public void setLabelForSong(Song song) {
+        lblPlaying.setText("Playing: " + song.getTitle());
     }
+
+    public void addSongToPlaylist(ActionEvent actionEvent) {
+        int songId = getSelectedSong().getId();
+        int playlistId = getSelectedPlaylist().getId();
+        model.addSongToPlaylist(playlistId, songId);
+        model.loadSongsOnPlaylist(playlistId);
+        model.getTotalPlaylistTime(playlistId);
+        getSelectedPlaylist().setNumberOfSongs(model.getNumberOfSongsInPlaylist(playlistId));
+        getSelectedPlaylist().setTotalDuration(String.valueOf(model.getTotalPlaylistTime(playlistId)));
+        tblPlaylist.refresh();
+        lstSongsInPlaylist.setItems(model.getSongsOnPlaylist());
+    }
+
+    /**
+     * Checking
+     */
+    private Time checkValidTime(String time) {
+        if (time == null || time.isEmpty()) {
+            throw new RuntimeException("Invalid time format: Input is null or empty.");
+        }
+
+        String timePattern = "^([01]?\\d|2[0-3]):[0-5]\\d(:[0-5]\\d(\\.\\d{1,7})?)?$";
+        String shortTimePattern = "^[0-5]?\\d:[0-5]\\d$"; // m:ss
+        if (!time.matches(timePattern) && !time.matches(shortTimePattern)) {
+            throw  new RuntimeException("Invalid time format: Does not match TIME pattern.");
+        }
+
+        try {
+            LocalTime parsedTime;
+
+            if (time.matches(shortTimePattern)) {
+                // Convert m:ss to HH:mm:ss by assuming hours = 0
+                String[] parts = time.split(":");
+                int minutes = Integer.parseInt(parts[0]);
+                int seconds = Integer.parseInt(parts[1]);
+                parsedTime = LocalTime.of(0, minutes, seconds);
+            } else {
+                // Parse HH:mm:ss or HH:mm directly
+                parsedTime = LocalTime.parse(time);
+            }
+            // Format the parsed time as HH:mm:ss
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm:ss");
+            String formattedTime = parsedTime.format(formatter);
+            // Return as SQL Time
+            return Time.valueOf(formattedTime);
+        } catch (Exception e) {
+            throw new RuntimeException("Invalid time format: Parsing failed.", e);
+        }
+    }
+
+    private int createNewCategory(String name) {
+        return model.createNewCategory(name);
+    }
+
 }

@@ -32,12 +32,20 @@ public class Playlist {
         this.name = name;
     }
 
-    public Time getTotalDuration(){
-        return totalDuration;
+    public String getTotalDuration(){
+        return String.valueOf(totalDuration);
+    }
+
+    public void setTotalDuration(String totalDuration){
+        this.totalDuration = Time.valueOf(totalDuration);
     }
 
     public int getNumberOfSongs(){
         return numberOfSongs;
+    }
+
+    public void setNumberOfSongs(int numberOfSongs){
+        this.numberOfSongs = numberOfSongs;
     }
 
     @Override

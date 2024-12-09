@@ -8,6 +8,9 @@ import dk.easv.mytunes.dal.DALManager;
 import dk.easv.mytunes.dal.FileManager;
 import dk.easv.mytunes.exceptions.DBException;
 import dk.easv.mytunes.ui.MainController;
+import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleObjectProperty;
+import javafx.beans.property.StringProperty;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
 import javafx.stage.Window;
@@ -16,6 +19,8 @@ import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.sql.Time;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -31,9 +36,15 @@ public class BLLManager {
     private Playlist currentPlaylist;
     private MainController mainController;
 
+    private ObjectProperty<String> currentSongTitleProperty = new SimpleObjectProperty<>();
+    private List<Song> playlistSongs;
 
     public List<Song> getAllSongs() throws DBException {
         return dalManager.getAllSongs();
+    }
+
+    public List<Song> getFilteredSongs(String filter) throws DBException {
+        return dalManager.getFilteredSongs(filter);
     }
 
     public List<Playlist> getAllPlaylists() throws DBException {
@@ -120,6 +131,13 @@ public class BLLManager {
         return null;
     }
 
+    public void setCurrentSongTitle(String title) {
+        this.currentSongTitleProperty.set(title);
+    }
+
+    public ObjectProperty<String> currentSongTitleProperty() {
+        return currentSongTitleProperty;
+    }
 
     public void playSong(Song song) throws Exception {
         if (song == null) {
@@ -135,14 +153,16 @@ public class BLLManager {
                 return;
             } else {
                 mediaPlayer.stop();
-                mediaPlayer.dispose();
+                //mediaPlayer.dispose();
             }
         }
 
         currentSong = song;
+        setCurrentSongTitle("Playing: " + song.getTitle());
+
 
         if (!Files.exists(path)) {
-            throw new Exception("Path to song does not exist on your PC.");
+            throw new DBException("Song does not exist.");
         } else {
             Media media = new Media(new File(filePath).toURI().toString());
             mediaPlayer = new MediaPlayer(media);
@@ -150,7 +170,6 @@ public class BLLManager {
             mediaPlayer.play();
 
             mediaPlayer.setOnEndOfMedia(() -> {
-                System.out.println("Song finished playing.");
                 mediaPlayer.stop();
             });
         }
@@ -217,6 +236,7 @@ public class BLLManager {
     }
 
 
+
     public String openFile(Window window) {
         ChooseFile fileBrowser = new ChooseFile(window);
         return fileBrowser.getSelectedFilePath();
@@ -247,8 +267,8 @@ public class BLLManager {
     public int numberOfSongsInList(int playlistId) {
         return dalManager.getNumberOfSongsInList(playlistId);
     }
-    public boolean deleteFromPlaylist(Song selectedSongInPlaylist, Playlist selectedPlaylist) {
-        return dalManager.deleteFromPlaylist(selectedSongInPlaylist, selectedPlaylist);
+    public void deleteFromPlaylist(Song selectedSongInPlaylist, Playlist selectedPlaylist) {
+        dalManager.deleteFromPlaylist(selectedSongInPlaylist, selectedPlaylist);
     }
     public boolean deleteSong(Song selectedSong, boolean deleteFile) {
         if (dalManager.deleteSong(selectedSong)) {
@@ -262,5 +282,28 @@ public class BLLManager {
             return true;
         } else
             throw new RuntimeException("Song could not be deleted from database");
+    }
+
+    public void addSongToPlaylist(int playlistId, int songId) {
+        dalManager.addSongToPlaylist(playlistId, songId);
+    }
+
+    public int addSong(String title, String artist, String filePath, Time duration, int category) {
+        return dalManager.addNewSong (title, artist, duration, filePath, category);
+    }
+
+    public int createNewCategory(String name) {
+        return dalManager.createNewCategory(name);
+    }
+
+    public int getNumberOfSongsInPLaylist(int playlistId) {
+        return dalManager.getNumberOfSongsInPlaylist(playlistId);
+    }
+
+    public void updatePlaylistTime(Time totalTime, int id) {
+        dalManager.updatePlaylistTime (totalTime, id);
+    }
+    public void updateTotalNumberOfSongs(int count, int id) {
+        dalManager.updateNumberOfSongs(count, id);
     }
 }

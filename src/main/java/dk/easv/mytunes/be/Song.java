@@ -11,15 +11,21 @@ public class Song {
     private final StringProperty duration;
     private final StringProperty filePath;
     private final IntegerProperty category;
+    private final StringProperty categoryName;
     private int order;
 
-    public Song(int id, String title, String artist, Time duration, String filePath, int category) {
+    public Song(int id, String title, String artist, Time duration, String filePath, int category, String categoryName) {
         this.id = new SimpleIntegerProperty(id);
         this.title = new SimpleStringProperty(title);
         this.artist = new SimpleStringProperty(artist);
         this.duration = new SimpleStringProperty(duration.toString());
         this.filePath = new SimpleStringProperty(filePath);
         this.category = new SimpleIntegerProperty(category);
+        this.categoryName = new SimpleStringProperty(categoryName);
+    }
+
+    public Song(int id, String title, String artist, Time duration, String filePath, int category) {
+        this(id, title, artist, duration, filePath, category, null);
     }
 
     // Getters for properties
@@ -29,6 +35,7 @@ public class Song {
     public StringProperty durationProperty() { return duration; }
     public StringProperty filePathProperty() { return filePath; }
     public IntegerProperty categoryProperty() { return category; }
+    public StringProperty categoryNameProperty() { return categoryName; }
 
     public int getId(){
         return id.get();
@@ -52,8 +59,8 @@ public class Song {
 
     public String getDuration(){ return duration.get(); }
 
-    public void setDuration(String duration){
-        this.duration.set(duration);
+    public void setDuration(Time duration){
+        this.duration.set(String.valueOf(duration));
     }
 
     public String getFilePath(){

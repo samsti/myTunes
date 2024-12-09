@@ -8,11 +8,13 @@ import dk.easv.mytunes.exceptions.DBException;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
+import java.sql.Time;
 import java.util.List;
 
 public class MyTunesModel {
     private final BLLManager manager = new BLLManager();
     private final ObservableList<Song> songs = FXCollections.observableArrayList();
+    private final ObservableList<Song> filteredSongs = FXCollections.observableArrayList();
     private final ObservableList<Playlist> playlists = FXCollections.observableArrayList();
     private final ObservableList<Song> songsOnPlaylist = FXCollections.observableArrayList();
 
@@ -22,6 +24,14 @@ public class MyTunesModel {
 
     public ObservableList<Song> getSongs() {
         return songs;
+    }
+
+    public void loadFilteredSongs(String filter) throws DBException {
+        filteredSongs.setAll(manager.getFilteredSongs(filter));
+    }
+
+    public ObservableList<Song> getFilteredSongs() {
+        return filteredSongs;
     }
 
     public void loadPlaylists() throws DBException {
@@ -76,11 +86,17 @@ public class MyTunesModel {
         }
     }
 
-    public void deleteFromPlaylist(Song selectedSongInPlaylist, Playlist selectedPlaylist) {
-        if (selectedSongInPlaylist != null && selectedPlaylist != null)
-            if (manager.deleteFromPlaylist(selectedSongInPlaylist, selectedPlaylist))
-                songsOnPlaylist.remove(selectedSongInPlaylist);
+    public void addSongToPlaylist(int playlistId, int songId) throws DBException {
+        manager.addSongToPlaylist(playlistId, songId);
     }
+
+    public void deleteFromPlaylist(Song selectedSongInPlaylist, Playlist selectedPlaylist) {
+        if (selectedSongInPlaylist != null && selectedPlaylist != null) {
+            manager.deleteFromPlaylist(selectedSongInPlaylist, selectedPlaylist);
+            songsOnPlaylist.remove(selectedSongInPlaylist);
+        }
+    }
+
     public void deleteSong(Song selectedSong, boolean deleteFile) {
         if (selectedSong != null) {
             if (manager.deleteSong(selectedSong, deleteFile))
@@ -90,5 +106,55 @@ public class MyTunesModel {
                         "Song and/or file could not be deleted" : "Song could not be deleted from database");
         } else
             throw new RuntimeException("No song is selected");
+    }
+
+    public int addSong(String title, String artist, String filePath, Time duration, int category) {
+        int songId;
+        songId = manager.addSong(title, artist, filePath, duration, category);
+        Song newSong = new Song(songId, title, artist, duration, filePath, category);
+        songs.add(newSong);
+        return songId;
+    }
+
+    public int createNewCategory(String name) {
+        return manager.createNewCategory(name);
+    }
+
+    public int getNumberOfSongsInPlaylist (int playlistId) {
+        int count = manager.getNumberOfSongsInPLaylist(playlistId);
+        for (Playlist playlist : playlists) {
+            if (playlist.getId() == playlistId) {
+                playlist.setNumberOfSongs(count);
+            }
+        }
+        manager.updateTotalNumberOfSongs(count, playlistId);
+        return count;
+    }
+    public Time getTotalPlaylistTime (int playlistId) {
+        Time totalTime;
+        int hour = 0;
+        int minute = 0;
+        int second = 0;
+        for (Song s : songsOnPlaylist) {
+            String duration = s.getDuration();
+            String[] parts = duration.split(":");
+            hour += Integer.parseInt(parts[0]);
+            minute += Integer.parseInt(parts[1]);
+            second += Integer.parseInt(parts[2]);
+        }
+        int minuteToAdd = second / 60;
+        second = second % 60;
+        minute += minuteToAdd;
+        int hourToAdd = minute / 60;
+        minute = minute % 60;
+        hour += hourToAdd;
+        totalTime = new Time(hour, minute, second);
+        for (Playlist playlist : playlists) {
+            if (playlist.getId() == playlistId) {
+                playlist.setTotalDuration(String.valueOf(totalTime));
+            }
+        }
+        manager.updatePlaylistTime(totalTime, playlistId);
+        return totalTime;
     }
 }
