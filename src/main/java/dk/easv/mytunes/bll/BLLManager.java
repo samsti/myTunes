@@ -7,6 +7,7 @@ import dk.easv.mytunes.dal.ChooseFile;
 import dk.easv.mytunes.dal.DALManager;
 import dk.easv.mytunes.dal.FileManager;
 import dk.easv.mytunes.exceptions.DBException;
+import dk.easv.mytunes.ui.MainController;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.StringProperty;
@@ -18,6 +19,7 @@ import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.sql.Time;
 import java.util.ArrayList;
 import java.util.List;
@@ -31,8 +33,10 @@ public class BLLManager {
     private MediaPlayer mediaPlayer;
     private Song currentSong;
     private Song currentSongInPlaylist;
-    private ObjectProperty<String> currentSongTitleProperty = new SimpleObjectProperty<>();
     private Playlist currentPlaylist;
+    private MainController mainController;
+
+    private ObjectProperty<String> currentSongTitleProperty = new SimpleObjectProperty<>();
     private List<Song> playlistSongs;
 
     public List<Song> getAllSongs() throws DBException {
@@ -55,6 +59,16 @@ public class BLLManager {
         return currentSong;
     }
 
+    public Song getCurrentSongInPlaylist(Playlist playlist) throws DBException {
+        return currentSongInPlaylist;
+    }
+
+
+    public String getCurrentSongTitle() throws DBException {
+        return currentSong.getTitle();
+    }
+
+
     public MediaPlayer getMediaPlayer() {
         return mediaPlayer;
     }
@@ -63,20 +77,9 @@ public class BLLManager {
         if (currentSong == null) {
             throw new IllegalArgumentException("Current song is null.");
         }
-        int currentIndex = -1;
-        if (!songList.equals(getAllSongs())) {
-            currentIndex = currentSong.getOrder() - 1;
-        }
-        else  {
-            for (int i = 0; i < songList.size(); i++) {
-                System.out.println("Comparing song ID: " + songList.get(i).getId() + " with current song ID: " + currentSong.getId());
-                if (songList.get(i).getId() == currentSong.getId()) {
-                    System.out.println("BLL found the ID: " + songList.get(i).getTitle());
-                    currentIndex = i;
-                    break;
-                }
-            }
-        }
+
+        int currentIndex = songList.indexOf(currentSong);
+
         if (currentIndex != -1 && currentIndex < songList.size() - 1) {
             return songList.get(currentIndex + 1);
         }
@@ -84,15 +87,45 @@ public class BLLManager {
         return null;
     }
 
-    public Song findPreviousSong(List<Song> songList, Song currentSong) {
-        if (this.currentSongInPlaylist == null) {
+    public Song findNextSongInPlaylist(Playlist playlist, Song currentSong) {
+        if (currentSong == null && playlist == null) {
             throw new IllegalArgumentException("Current song is null.");
         }
 
-        int currentIndex = currentSongInPlaylist.getOrder()-1;
+        List<Song> playlistSongs = mainController.getSongsInPlaylist();
+
+        int currentIndex = playlistSongs.indexOf(currentSong);
+
+        if (currentIndex != -1 && currentIndex < playlistSongs.size() - 1) {
+            return playlistSongs.get(currentIndex + 1);
+        }
+
+        return null;
+    }
+
+    public Song findPreviousSong(List<Song> songList, Song currentSong) {
+        if (currentSong == null) {
+            throw new IllegalArgumentException("Current song is null.");
+        }
+
+        int currentIndex = songList.indexOf(currentSong);
 
         if (currentIndex > 0) {
             return songList.get(currentIndex - 1);
+        }
+
+        return null;
+    }
+
+    public Playlist findPreviousSongInPlaylist(List<Playlist> playlistList, Song currentSong) {
+        if (currentSong == null) {
+            throw new IllegalArgumentException("Current song is null.");
+        }
+
+        int currentIndex = playlistList.indexOf(currentSong);
+
+        if (currentIndex > 0) {
+            return playlistList.get(currentIndex - 1);
         }
 
         return null;
@@ -143,49 +176,46 @@ public class BLLManager {
     }
 
     public void playSongInPlaylist(Song song, Playlist playlist) throws Exception {
-        playlistSongs = new ArrayList<>(getAllSongs());
         if (song == null && playlist == null) {
-            //throw new IllegalArgumentException("Song or Playlist cannot be null");
-            currentSongInPlaylist = playlistSongs.getFirst();
-        }
-        if (playlist != null) {
-            playlistSongs = new ArrayList<>(getSongsOnPlaylist(playlist.getId()));
-            currentSongInPlaylist = playlistSongs.getFirst();
-        }
-        if (song != null)
-            currentSongInPlaylist = song;
-        boolean songFound = playlistSongs.stream().anyMatch(playlistSong -> playlistSong.getId() == currentSongInPlaylist.getId());
-        if (!songFound) {
-            throw new IllegalArgumentException("The song is not in the provided playlist.");
+            throw new IllegalArgumentException("Song or Playlist cannot be null");
         }
 
+        List<Song> playlistSongs = new ArrayList<>(getSongsOnPlaylist(playlist.getId()));
 
-        playSong(currentSongInPlaylist);
 
+        String filePath = song.getFilePath();
+        Path path = Paths.get(filePath);
 
-        currentPlaylist = playlist;
-
-        List<Song> finalPlaylistSongs = playlistSongs;
-        mediaPlayer.setOnEndOfMedia(() -> {
-            try {
-                /** Find the next song in the playlist
-                 int currentIndex = finalPlaylistSongs.indexOf(finalSong);
-                 int nextIndex = currentIndex + 1;
-
-                 if (nextIndex < finalPlaylistSongs.size()) {
-                 Song nextSong = finalPlaylistSongs.get(nextIndex);
-                 playSongInPlaylist(nextSong, playlist);
-                 } else {
-                 System.out.println("Reached the end of the playlist.");
-                 }*/
-                Song nextSong = findNextSong(finalPlaylistSongs, currentSongInPlaylist);
-                playSongInPlaylist(nextSong, currentPlaylist);
-            } catch (Exception e) {
-                e.printStackTrace();
+        if (mediaPlayer != null && Files.exists(path)) {
+            if (mediaPlayer.getStatus() == MediaPlayer.Status.PAUSED) {
+                mediaPlayer.play();
+                return;
+            } else {
+                mediaPlayer.stop();
+                mediaPlayer.dispose();
             }
-        });
+        }
 
+        currentSongInPlaylist = song;
+
+        if (!Files.exists(path)) {
+            throw new Exception("No path found");
+        }
+        else {
+            Media media = new Media(new File(filePath).toURI().toString());
+            mediaPlayer = new MediaPlayer(media);
+            mediaPlayer.setVolume(volume);
+            mediaPlayer.play();
+
+            mediaPlayer.setOnEndOfMedia(() -> {
+                System.out.println("Song finished playing.");
+                mediaPlayer.stop();
+            });
+        }
     }
+
+
+
 
     public void stopSong() throws Exception {
         if (mediaPlayer != null && mediaPlayer.getStatus() == MediaPlayer.Status.PLAYING) {
@@ -205,13 +235,7 @@ public class BLLManager {
         return volume;
     }
 
-    public String getCurrentSongTitle() throws DBException {
-        return currentSong.getTitle();
-    }
 
-    public Song getCurrentSongInPlaylist(Playlist playlist) throws DBException {
-        return currentSongInPlaylist;
-    }
 
     public String openFile(Window window) {
         ChooseFile fileBrowser = new ChooseFile(window);
@@ -246,7 +270,7 @@ public class BLLManager {
     public void deleteFromPlaylist(Song selectedSongInPlaylist, Playlist selectedPlaylist) {
         dalManager.deleteFromPlaylist(selectedSongInPlaylist, selectedPlaylist);
     }
-    public boolean deletSong(Song selectedSong, boolean deleteFile) {
+    public boolean deleteSong(Song selectedSong, boolean deleteFile) {
         if (dalManager.deleteSong(selectedSong)) {
             if (deleteFile) {
                 FileManager fileManager = new FileManager();
