@@ -103,7 +103,7 @@ public class MainController implements Initializable {
                 manager.setVolume(volume/100); //Passes the new volume to the Business Layer
             }
         });
-
+/*
         tblPlaylist.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
             if (newValue != null) {
                 tblSongs.getSelectionModel().clearSelection();
@@ -116,8 +116,10 @@ public class MainController implements Initializable {
 
             }
         });
-
+ */
     }
+
+
 
     private void loadSongs() {
         titleColumn.setCellValueFactory(cellData -> cellData.getValue().titleProperty());
