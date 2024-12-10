@@ -186,6 +186,7 @@ public class MainController implements Initializable {
 
         if (!playlistName.isBlank()) {
             model.createPlaylist(playlistName);
+
         } else {
             a.setAlertType(Alert.AlertType.ERROR);
             a.setContentText("Please fill in all fields");
@@ -195,6 +196,8 @@ public class MainController implements Initializable {
         txtNewPlaylist.setText("");
         popupBg.setVisible(false);
         popupVBox.setVisible(false);
+        model.loadPlaylists();
+        tblPlaylist.setItems(model.getPlaylists());
     }
     @FXML
     private void btnNewSongClicked(ActionEvent event) {
