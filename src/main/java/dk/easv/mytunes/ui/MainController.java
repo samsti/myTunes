@@ -302,6 +302,7 @@ public class MainController implements Initializable {
 
     @FXML
     private void btnPlayClicked(ActionEvent event) {
+        volumeSlider.setDisable(false);
         Song nextSong = null;
 
         try {
