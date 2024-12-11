@@ -1,0 +1,166 @@
+/* General body styling */
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f7f9fc;
+    color: #333;
+    margin: 0;
+    padding: 0;
+}
+
+/* Main container styling */
+#mainContainer {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+}
+
+/* Panel styling */
+.panel {
+    background-color: #ffffff;
+    border-radius: 8px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+    margin: 10px;
+}
+
+/* Buttons styling */
+button {
+    background-color: #4CAF50;
+    border: none;
+    color: white;
+    padding: 10px 15px;
+    text-align: center;
+    text-decoration: none;
+    font-size: 16px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+button:hover {
+    background-color: #45a049;
+}
+
+/* Inputs and text styling */
+input, select {
+    width: 100%;
+    padding: 10px;
+    margin: 5px 0 20px 0;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    box-sizing: border-box;
+    font-size: 14px;
+}
+
+/* Playlist table styling */
+.table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.table th, .table td {
+    padding: 10px;
+    text-align: left;
+    border-bottom: 1px solid #ddd;
+}
+
+.table th {
+    background-color: #f4f4f4;
+    font-weight: bold;
+}
+
+.table tr:hover {
+    background-color: #f1f1f1;
+}
+
+/* Playlist sidebar styling */
+.playlist-sidebar {
+    background-color: #ffffff;
+    border-radius: 8px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    padding: 10px;
+}
+
+/* Now playing section */
+.now-playing {
+    background-color: #e6f7ff;
+    padding: 15px;
+    border-radius: 5px;
+    margin-bottom: 20px;
+    text-align: center;
+    font-size: 18px;
+    font-weight: bold;
+}
+
+/* Modal styling */
+.modal {
+    background-color: #ffffff;
+    border-radius: 8px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+    width: 300px;
+}
+
+.modal input, .modal select {
+    margin-bottom: 10px;
+}
+
+.modal button {
+    margin-top: 10px;
+}
+
+/* Filter input */
+#filter {
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+}
+
+.popup-vbox {
+    -fx-background-color: gray;
+    -fx-border-color: black;
+    -fx-border-width: 2px;
+    -fx-border-radius: 10px;
+    -fx-background-radius: 10px;
+    -fx-padding: 15px;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.5), 10, 0, 0, 3);
+    -fx-opacity: 1;
+}
+.popup-bg {
+    -fx-background-color: gray;
+    -fx-opacity: 0.15;
+}
+/* Custom buttons for navigation (Back, Play, Next) */
+#btnBack, #btnPlay, #btnNext, #btnStop {
+    -fx-background-color: linear-gradient(to bottom, #222, #111),
+    linear-gradient(to bottom, #444, #333);
+    -fx-border-color: #555;
+    -fx-text-fill: white;
+    -fx-padding: 0;
+    -fx-background-radius: 5px;
+    -fx-pref-width: 35px;
+    -fx-pref-height: 35px;
+    -fx-background-size: contain;
+}
+#btnBack {
+    -fx-background-image: url('/dk/easv/mytunes/css/img/previous.png');
+    -fx-background-size: cover;
+    -fx-background-position: center;
+}
+#btnPlay {
+    -fx-background-image: url('/dk/easv/mytunes/css/img/play.png');
+    -fx-background-size: cover;
+    -fx-background-position: center;
+}
+#btnStop {
+    -fx-background-image: url('/dk/easv/mytunes/css/img/stop.png');
+    -fx-background-size: cover;
+    -fx-background-position: center;
+}
+#btnNext {
+    -fx-background-image: url('/dk/easv/mytunes/css/img/next.png');
+    -fx-background-size: cover;
+    -fx-background-position: center;
+}
