@@ -443,7 +443,15 @@ public class MainController implements Initializable {
     @FXML
     private void btnChooseClicked(ActionEvent event) {
         String filepath =  manager.openFile(btnChoose.getScene().getWindow());
-        txtFilePath.setText(filepath);
+        if (filepath != null) {
+            txtFilePath.setText(filepath);
+
+            String duration = manager.getDuration();
+            txtTime.setText(duration);
+        } else {
+            txtFilePath.setText("No file selected");
+            txtTime.setText("");
+        }
     }
 
     @FXML

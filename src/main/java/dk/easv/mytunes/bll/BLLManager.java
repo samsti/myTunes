@@ -35,6 +35,7 @@ public class BLLManager {
     private Song currentSongInPlaylist;
     private Playlist currentPlaylist;
     private MainController mainController;
+    private ChooseFile fileBrowser;
 
     private ObjectProperty<String> currentSongTitleProperty = new SimpleObjectProperty<>();
     private List<Song> playlistSongs;
@@ -235,12 +236,23 @@ public class BLLManager {
         return volume;
     }
 
-
+    public String getDuration() {
+        if (fileBrowser != null) {
+            return fileBrowser.getDuration();
+        }
+        return "No file selected";
+    }
 
     public String openFile(Window window) {
-        ChooseFile fileBrowser = new ChooseFile(window);
-        return fileBrowser.getSelectedFilePath();
+        fileBrowser = new ChooseFile(window);
+
+        if (fileBrowser.getSelectedFilePath() != null) {
+            return fileBrowser.getSelectedFilePath();
+        }
+        return null;
     }
+
+
     public boolean editPlaylistName(Playlist playlist) {
         return dalManager.editPlaylistName(playlist);
     }
