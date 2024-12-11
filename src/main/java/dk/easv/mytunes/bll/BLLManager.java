@@ -300,7 +300,7 @@ public class BLLManager {
         return dalManager.getNumberOfSongsInPlaylist(playlistId);
     }
 
-    public void updatePlaylistTime(Time totalTime, int id) {
+    public void updatePlaylistTime(String totalTime, int id) {
         dalManager.updatePlaylistTime (totalTime, id);
     }
     public void updateTotalNumberOfSongs(int count, int id) {
