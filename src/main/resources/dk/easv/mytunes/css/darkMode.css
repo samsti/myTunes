@@ -97,15 +97,60 @@
     -fx-border-color: #444;
     -fx-border-radius: 2;
 }
+.list-view {
+    -fx-background-color: #333; /* Match TableView's background */
+    -fx-control-inner-background: #333; /* Background for items */
+    -fx-border-color: #555; /* Border color */
+    -fx-selection-bar: #555; /* Color for selected item background */
+    -fx-selection-bar-text: white; /* Text color for selected items */
+}
 
+.list-cell:filled:selected, .list-cell:focused:selected {
+    -fx-background: #555; /* Highlight color for selected item */
+    -fx-text-fill: white; /* Text color for selected item */
+}
+
+.list-cell:filled:hover {
+    -fx-background: #444; /* Hover color for list items */
+    -fx-text-fill: white; /* Text color for hovered item */
+}
+
+#rootPane {
+    -fx-background-image: url('img/bg.jpg');
+    -fx-background-position: center;
+    -fx-background-size: cover;
+}
 /* Custom buttons for navigation (Back, Play, Next) */
-#btnBack, #btnPlay, #btnNext {
+#btnBack, #btnPlay, #btnNext, #btnStop {
     -fx-background-color: linear-gradient(to bottom, #222, #111),
     linear-gradient(to bottom, #444, #333);
     -fx-border-color: #555;
     -fx-text-fill: white;
-    -fx-padding: 5;
+    -fx-padding: 0;
     -fx-background-radius: 5px;
+    -fx-pref-width: 35px;
+    -fx-pref-height: 35px;
+    -fx-background-size: contain;
+}
+#btnBack {
+    -fx-background-image: url('/dk/easv/mytunes/css/img/previous.png');
+    -fx-background-size: cover;
+    -fx-background-position: center;
+}
+#btnPlay {
+    -fx-background-image: url('/dk/easv/mytunes/css/img/play.png');
+    -fx-background-size: cover;
+    -fx-background-position: center;
+}
+#btnStop {
+    -fx-background-image: url('/dk/easv/mytunes/css/img/stop.png');
+    -fx-background-size: cover;
+    -fx-background-position: center;
+}
+#btnNext {
+    -fx-background-image: url('/dk/easv/mytunes/css/img/next.png');
+    -fx-background-size: cover;
+    -fx-background-position: center;
 }
 
 #btnBack:hover, #btnPlay:hover, #btnNext:hover {
@@ -132,7 +177,7 @@
 
 /* Highlight the song currently "Now Playing" */
 #lblPlaying {
-    -fx-text-fill: yellow;
+    -fx-text-fill: #FF8C00;
     -fx-font-weight: bold;
 }
 .popup-vbox {
