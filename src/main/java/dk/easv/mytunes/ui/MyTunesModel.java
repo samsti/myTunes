@@ -130,8 +130,8 @@ public class MyTunesModel {
         manager.updateTotalNumberOfSongs(count, playlistId);
         return count;
     }
-    public Time getTotalPlaylistTime (int playlistId) {
-        Time totalTime;
+    public String getTotalPlaylistTime (int playlistId) {
+        String totalTime;
         int hour = 0;
         int minute = 0;
         int second = 0;
@@ -148,10 +148,12 @@ public class MyTunesModel {
         int hourToAdd = minute / 60;
         minute = minute % 60;
         hour += hourToAdd;
-        totalTime = new Time(hour, minute, second);
+        totalTime = (hour < 10 ? "0" + hour : hour) + ":" + (minute < 10 ? "0" + minute : minute) + ":" +
+                (second < 10 ? "0" + second : second);
+        System.out.println(totalTime);
         for (Playlist playlist : playlists) {
             if (playlist.getId() == playlistId) {
-                playlist.setTotalDuration(String.valueOf(totalTime));
+                playlist.setTotalDuration(totalTime);
             }
         }
         manager.updatePlaylistTime(totalTime, playlistId);

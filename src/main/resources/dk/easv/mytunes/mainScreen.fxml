@@ -58,6 +58,7 @@
             <Button fx:id="btnEditSong" layoutX="725.0" layoutY="551.0" mnemonicParsing="false" onAction="#btnEditSongClicked" text="Edit" />
             <Button fx:id="btnDeleteSong" layoutX="777.0" layoutY="549.0" mnemonicParsing="false" onAction="#btnDeleteSongClicked" text="Delete" />
             <Button fx:id="btnClose" layoutX="872.0" layoutY="45.0" mnemonicParsing="false" onAction="#btnCloseClicked" text="Close" />
+            <Label fx:id="lblVolume" layoutX="234.0" layoutY="87.0" visible="false" />
          </children>
       </AnchorPane>
       <VBox fx:id="popupBg" prefHeight="600" prefWidth="800" styleClass="popup-bg" visible="false" />

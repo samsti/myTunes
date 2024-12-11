@@ -10,6 +10,7 @@ import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
@@ -73,6 +74,7 @@ public class MainController implements Initializable {
     @FXML private TableColumn<Song, String> durationColumn;
     @FXML private TableColumn<Song, String> categoryColumn;
     @FXML private Slider volumeSlider;
+    @FXML private Label lblVolume;
     private final MyTunesModel model = new MyTunesModel();
     @FXML private VBox popupDelete;
     @FXML private Label lblDeleting;
@@ -98,6 +100,7 @@ public class MainController implements Initializable {
         popupBg.setPrefWidth(rootPane.getWidth());
         popupBg.setPrefHeight(rootPane.getHeight());
         loadSongs();
+        lblVolume.setText(String.valueOf(manager.getVolume()) + "%");
 
        // Adds a listener to any slider changes
         volumeSlider.valueProperty().addListener(new ChangeListener<Number>() {
@@ -105,8 +108,11 @@ public class MainController implements Initializable {
             public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
                 double volume = newValue.doubleValue();
                 manager.setVolume(volume/100); //Passes the new volume to the Business Layer
+                lblVolume.setVisible(true);
+                lblVolume.setText(String.format("%.2f", volume) + "%");
             }
         });
+        volumeSlider.setOnMouseReleased(event -> lblVolume.setVisible(false));
 /*
         tblPlaylist.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
             if (newValue != null) {
@@ -437,7 +443,8 @@ public class MainController implements Initializable {
 
     @FXML
     private void setVolume(MouseEvent event) {
-        mediaPlayer.setVolume(manager.getVolume());
+        //mediaPlayer.setVolume(manager.getVolume());
+        manager.setVolume(volumeSlider.getValue()/100);
     }
 
     @FXML

@@ -84,7 +84,7 @@ public class DALManager {
                 playlists.add(new Playlist(
                         rs.getInt("id"),
                         rs.getString("name"),
-                        rs.getTime("total_duration"),
+                        rs.getString("total_duration"),
                         rs.getInt("number_of_songs"))
                 );
             }
@@ -373,11 +373,12 @@ public class DALManager {
 
     }
 
-    public void updatePlaylistTime(Time totalTime, int id) {
+    public void updatePlaylistTime(String totalTime, int id) {
         try (Connection con = cm.getConnection()) {
             String sqlcommand = "UPDATE playlists SET total_duration = ?WHERE id = ?";
             PreparedStatement statement = con.prepareStatement(sqlcommand);
-            statement.setString(1, totalTime.toString());
+            //TODO: when DB changes to String delete Time.valueOf
+            statement.setTime(1, Time.valueOf(totalTime));
             statement.setInt(2, id);
             statement.executeUpdate();
         } catch (SQLException e) {
