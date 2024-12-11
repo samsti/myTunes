@@ -1,5 +1,6 @@
 package dk.easv.mytunes.dal;
 
+import com.mpatric.mp3agic.*;
 import javafx.stage.FileChooser;
 import javafx.stage.Window;
 
@@ -20,6 +21,26 @@ public class ChooseFile {
         fileChooser.getExtensionFilters().addAll(extFilter, extFilter2, extFilter3);
         //Open dialogs, when finishes the File will be stored in chosenFile
         chosenFile = fileChooser.showOpenDialog(window);
+
+    }
+
+    public String getDuration() {
+        try {
+            if (chosenFile == null) {
+                return null;
+            }
+
+            Mp3File mp3file = new Mp3File(getSelectedFilePath());
+            int durationInSeconds = (int) mp3file.getLengthInSeconds();
+
+            int minutes = durationInSeconds / 60;
+            int seconds = durationInSeconds % 60;
+            return String.format("%d:%02d", minutes, seconds);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return "Error reading file";
+        }
     }
 
     public String getSelectedFilePath() {
