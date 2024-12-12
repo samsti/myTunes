@@ -236,11 +236,11 @@ public class BLLManager {
         return volume;
     }
 
-    public String getDuration() {
+    public String[] getDuration() {
         if (fileBrowser != null) {
             return fileBrowser.getDuration();
         }
-        return "No file selected";
+        return null;
     }
 
     public String openFile(Window window) {

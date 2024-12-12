@@ -454,8 +454,22 @@ public class MainController implements Initializable {
         if (filepath != null) {
             txtFilePath.setText(filepath);
 
-            String duration = manager.getDuration();
-            txtTime.setText(duration);
+            if (manager.getDuration() != null) {
+                String[] metaData = manager.getDuration();
+                txtSongTitle.setText(metaData[0]);
+                txtSongArtist.setText(metaData[1]);
+                txtTime.setText(metaData[2]);
+
+                //Selects the category from the metaData
+                if (metaData[3] != null && !metaData[3].isEmpty()) {
+                    for (Category c : choiceCategory.getItems()) {
+                        if (c.getCategory().toLowerCase().trim().equals(metaData[3].toLowerCase().trim())) {
+                            Category metaCategory = new Category(c.getId(), c.getCategory());
+                            choiceCategory.setValue(metaCategory);
+                        }
+                    }
+                }
+            }
         } else {
             txtFilePath.setText("No file selected");
             txtTime.setText("");
@@ -581,6 +595,7 @@ public class MainController implements Initializable {
         txtNewCategory.setVisible(false);
         btnAddCategory.setVisible(false);
         btnChooseCategory.setVisible(true);
+        choiceCategory.getSelectionModel().select(0);
     }
     private void openDeleteWindow() {
         popupBg.setVisible(true);
