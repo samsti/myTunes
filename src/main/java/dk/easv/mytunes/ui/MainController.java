@@ -112,8 +112,9 @@ public class MainController implements Initializable {
                 lblVolume.setText(String.format("%.2f", volume) + "%");
             }
         });
+
         volumeSlider.setOnMouseReleased(event -> lblVolume.setVisible(false));
-/*
+
         tblPlaylist.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
             if (newValue != null) {
                 tblSongs.getSelectionModel().clearSelection();
@@ -126,7 +127,9 @@ public class MainController implements Initializable {
 
             }
         });
- */
+
+
+
     }
 
 
@@ -329,6 +332,7 @@ public class MainController implements Initializable {
                     lblPlaying.setText("No song selected in playlist");
                     return;
                 }
+                System.out.println(lstSongsInPlaylist.getItems());
 
                 manager.playSongInPlaylist(playlistSong, playlistToPlay);
                 lblPlaying.setText("Playing: " + playlistSong.getTitle() + " from playlist " + playlistToPlay.getName());
@@ -340,8 +344,7 @@ public class MainController implements Initializable {
                 nextSong = manager.getCurrentSong();
                 lblPlaying.setText(nextSong.getTitle() + " - path not found");
             } if(getSelectedPlaylist() != null && getSelectedSongInPlaylist() != null) {
-                Playlist playlistToPlay = getSelectedPlaylist();
-                nextSong = manager.getCurrentSongInPlaylist(playlistToPlay);
+                nextSong = manager.getCurrentSong();
                 lblPlaying.setText(nextSong.getTitle() + " - path not found");
             }
         }
@@ -367,6 +370,15 @@ public class MainController implements Initializable {
         tblSongs.scrollTo(index);
     }
 
+    private void setCurrentSelectedSongInPlaylist(Song song) {
+        List<Song> songList;
+        ObservableList<Song> observableList = lstSongsInPlaylist.getItems();
+        songList = new ArrayList<>(observableList);
+        int index = songList.indexOf(song);
+        lstSongsInPlaylist.getSelectionModel().select(index);
+        lstSongsInPlaylist.scrollTo(index);
+    }
+
     public List<Song> getSongsInPlaylist() {
         List<Song> lstOfSongsInPlaylist = new ArrayList<>(lstSongsInPlaylist.getItems());
         return lstOfSongsInPlaylist;
@@ -378,35 +390,48 @@ public class MainController implements Initializable {
         Song nextSong = null;
 
         try {
-            Song currentSongInPlaylist = manager.getCurrentSongInPlaylist(getSelectedPlaylist());
             Playlist currentPlaylist = getSelectedPlaylist();
 
-            if (currentSongInPlaylist == null || currentPlaylist == null) {
-                ObservableList<Song> observableList = tblSongs.getItems();
-                songList = new ArrayList<>(observableList);
-                Song currentSong = manager.getCurrentSong();
-                nextSong = manager.findNextSong(songList, currentSong);
+                if (currentPlaylist == null) {
+                    ObservableList<Song> observableList = tblSongs.getItems();
+                    songList = new ArrayList<>(observableList);
+                    Song currentSong = manager.getCurrentSong();
+                    nextSong = manager.findNextSong(songList, currentSong);
+
+                    if (manager.getCurrentIndex() >= songList.size() - 1) {
+                       lblPlaying.setText("No more songs available");
+                    }
+                    else {
+                        manager.playSong(nextSong);
+                        setCurrentSelectedSong(nextSong);
+                        lblPlaying.setText("Now playing: " + nextSong.getTitle());
+                    }
 
 
-                manager.playSong(nextSong);
-                setCurrentSelectedSong(nextSong);
-                lblPlaying.setText("Now playing: " + nextSong.getTitle());
-            }
+                }
 
+                if (currentPlaylist != null) {
+                    ObservableList<Song> observableList = lstSongsInPlaylist.getItems();
+                    songList = new ArrayList<>(observableList);
+                    Song currentSong = manager.getCurrentSong();
+                    nextSong = manager.findNextSong(songList, currentSong);
 
-           if (nextSong != null && currentPlaylist != null) {
+                    if (manager.getCurrentIndex() >= songList.size() - 1) {
+                        lblPlaying.setText("No more songs available in playlist");
+                    }
+                    else {
+                        manager.playSongInPlaylist(nextSong, currentPlaylist);
+                        setCurrentSelectedSongInPlaylist(nextSong);
+                        lblPlaying.setText("Now playing: " + nextSong.getTitle() + "in Playlist: " + currentPlaylist.getName());
+                    }
+                }
 
-               Song currentSong = manager.getCurrentSong();
-               nextSong = manager.findNextSongInPlaylist(currentPlaylist, currentSong);
-               manager.playSongInPlaylist(nextSong, currentPlaylist);
-               setCurrentSelectedSong(nextSong);
-               lblPlaying.setText("Now playing: " + nextSong.getTitle() + "in Playlist: " + currentPlaylist.getName()) ;
-
-           }
 
         } catch (Exception e) {
             e.printStackTrace();
             lblPlaying.setText(manager.getCurrentSongTitle() + " - path not found");
+            setCurrentSelectedSong(nextSong);
+            setCurrentSelectedSongInPlaylist(nextSong);
             MediaPlayer player = manager.getMediaPlayer();
             player.stop();
         }
@@ -418,25 +443,46 @@ public class MainController implements Initializable {
     private void btnPlayPreviousClicked(ActionEvent event) {
         List<Song> songList = null;
         Song previousSong = null;
+
         try {
-            ObservableList<Song> observableList = tblSongs.getItems();
-            songList = new ArrayList<>(observableList);
+            Playlist currentPlaylist = getSelectedPlaylist();
 
-            Song currentSong = manager.getCurrentSong();
+            if (currentPlaylist == null) {
+                ObservableList<Song> observableList = tblSongs.getItems();
+                songList = new ArrayList<>(observableList);
+                Song currentSong = manager.getCurrentSong();
+                previousSong = manager.findPreviousSong(songList, currentSong);
 
-            previousSong = manager.findPreviousSong(songList, currentSong);
-
-            if (previousSong != null) {
-                manager.playSong(previousSong);
-                lblPlaying.setText("Now playing: " + previousSong.getTitle());
-                setCurrentSelectedSong(previousSong);
-            } else {
-                lblPlaying.setText("No previous song available.");
+                if (previousSong != null) {
+                    manager.playSong(previousSong);
+                    setCurrentSelectedSong(previousSong);
+                    lblPlaying.setText("Now playing: " + previousSong.getTitle());
+                } else {
+                    lblPlaying.setText("No previous song available.");
+                }
             }
+
+            if (currentPlaylist != null) {
+                ObservableList<Song> observableList = lstSongsInPlaylist.getItems();
+                songList = new ArrayList<>(observableList);
+                Song currentSong = manager.getCurrentSong();
+                previousSong = manager.findPreviousSong(songList, currentSong);
+
+                if (previousSong != null) {
+                    manager.playSongInPlaylist(previousSong, currentPlaylist);
+                    setCurrentSelectedSongInPlaylist(previousSong);
+                    lblPlaying.setText("Now playing: " + previousSong.getTitle() + " in Playlist: " + currentPlaylist.getName());
+                } else {
+                    lblPlaying.setText("No previous song available in playlist.");
+                }
+            }
+
         } catch (Exception e) {
+            e.printStackTrace();
             lblPlaying.setText(manager.getCurrentSongTitle() + " - path not found");
-            MediaPlayer player = manager.getMediaPlayer();
             setCurrentSelectedSong(previousSong);
+            setCurrentSelectedSongInPlaylist(previousSong);
+            MediaPlayer player = manager.getMediaPlayer();
             player.stop();
         }
     }
