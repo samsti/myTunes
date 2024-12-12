@@ -458,6 +458,16 @@ public class MainController implements Initializable {
                 txtSongTitle.setText(metaData[0]);
                 txtSongArtist.setText(metaData[1]);
                 txtTime.setText(metaData[2]);
+
+                //Selects the category from the metaData
+                if (metaData[3] != null && !metaData[3].isEmpty()) {
+                    for (Category c : choiceCategory.getItems()) {
+                        if (c.getCategory().toLowerCase().trim().equals(metaData[3].toLowerCase().trim())) {
+                            Category metaCategory = new Category(c.getId(), c.getCategory());
+                            choiceCategory.setValue(metaCategory);
+                        }
+                    }
+                }
             }
         } else {
             txtFilePath.setText("No file selected");
