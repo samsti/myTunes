@@ -594,6 +594,7 @@ public class MainController implements Initializable {
         txtNewCategory.setVisible(false);
         btnAddCategory.setVisible(false);
         btnChooseCategory.setVisible(true);
+        choiceCategory.getSelectionModel().select(0);
     }
     private void openDeleteWindow() {
         popupBg.setVisible(true);
