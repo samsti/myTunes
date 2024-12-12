@@ -35,6 +35,7 @@ public class BLLManager {
     private Song currentSongInPlaylist;
     private Playlist currentPlaylist;
     private MainController mainController;
+    private int currentIndex;
 
     private ObjectProperty<String> currentSongTitleProperty = new SimpleObjectProperty<>();
     private List<Song> playlistSongs;
@@ -68,6 +69,10 @@ public class BLLManager {
         return currentSong.getTitle();
     }
 
+    public int getCurrentIndex() throws DBException {
+        return currentIndex;
+    }
+
 
     public MediaPlayer getMediaPlayer() {
         return mediaPlayer;
@@ -78,7 +83,7 @@ public class BLLManager {
             throw new IllegalArgumentException("Current song is null.");
         }
 
-        int currentIndex = songList.indexOf(currentSong);
+        currentIndex = songList.indexOf(currentSong);
 
         if (currentIndex != -1 && currentIndex < songList.size() - 1) {
             return songList.get(currentIndex + 1);
@@ -87,21 +92,6 @@ public class BLLManager {
         return null;
     }
 
-    public Song findNextSongInPlaylist(Playlist playlist, Song currentSong) {
-        if (currentSong == null && playlist == null) {
-            throw new IllegalArgumentException("Current song is null.");
-        }
-
-        List<Song> playlistSongs = mainController.getSongsInPlaylist();
-
-        int currentIndex = playlistSongs.indexOf(currentSong);
-
-        if (currentIndex != -1 && currentIndex < playlistSongs.size() - 1) {
-            return playlistSongs.get(currentIndex + 1);
-        }
-
-        return null;
-    }
 
     public Song findPreviousSong(List<Song> songList, Song currentSong) {
         if (currentSong == null) {
@@ -112,20 +102,6 @@ public class BLLManager {
 
         if (currentIndex > 0) {
             return songList.get(currentIndex - 1);
-        }
-
-        return null;
-    }
-
-    public Playlist findPreviousSongInPlaylist(List<Playlist> playlistList, Song currentSong) {
-        if (currentSong == null) {
-            throw new IllegalArgumentException("Current song is null.");
-        }
-
-        int currentIndex = playlistList.indexOf(currentSong);
-
-        if (currentIndex > 0) {
-            return playlistList.get(currentIndex - 1);
         }
 
         return null;
@@ -196,7 +172,7 @@ public class BLLManager {
             }
         }
 
-        currentSongInPlaylist = song;
+        currentSong = song;
 
         if (!Files.exists(path)) {
             throw new Exception("No path found");
