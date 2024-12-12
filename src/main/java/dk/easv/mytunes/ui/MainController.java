@@ -123,8 +123,7 @@ public class MainController implements Initializable {
 
         tblSongs.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
             if (newValue != null) {
-                tblPlaylist.getSelectionModel().clearSelection();
-
+                //tblPlaylist.getSelectionModel().clearSelection();
             }
         });
 

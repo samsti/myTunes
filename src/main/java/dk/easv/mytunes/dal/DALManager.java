@@ -377,8 +377,7 @@ public class DALManager {
         try (Connection con = cm.getConnection()) {
             String sqlcommand = "UPDATE playlists SET total_duration = ?WHERE id = ?";
             PreparedStatement statement = con.prepareStatement(sqlcommand);
-            //TODO: when DB changes to String delete Time.valueOf
-            statement.setTime(1, Time.valueOf(totalTime));
+            statement.setString(1, totalTime);
             statement.setInt(2, id);
             statement.executeUpdate();
         } catch (SQLException e) {
