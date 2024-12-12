@@ -10,6 +10,7 @@ import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
@@ -73,6 +74,7 @@ public class MainController implements Initializable {
     @FXML private TableColumn<Song, String> durationColumn;
     @FXML private TableColumn<Song, String> categoryColumn;
     @FXML private Slider volumeSlider;
+    @FXML private Label lblVolume;
     private final MyTunesModel model = new MyTunesModel();
     @FXML private VBox popupDelete;
     @FXML private Label lblDeleting;
@@ -98,6 +100,7 @@ public class MainController implements Initializable {
         popupBg.setPrefWidth(rootPane.getWidth());
         popupBg.setPrefHeight(rootPane.getHeight());
         loadSongs();
+        lblVolume.setText(String.valueOf(manager.getVolume()) + "%");
 
        // Adds a listener to any slider changes
         volumeSlider.valueProperty().addListener(new ChangeListener<Number>() {
@@ -105,8 +108,12 @@ public class MainController implements Initializable {
             public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
                 double volume = newValue.doubleValue();
                 manager.setVolume(volume/100); //Passes the new volume to the Business Layer
+                lblVolume.setVisible(true);
+                lblVolume.setText(String.format("%.2f", volume) + "%");
             }
         });
+
+        volumeSlider.setOnMouseReleased(event -> lblVolume.setVisible(false));
 
         tblPlaylist.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
             if (newValue != null) {
@@ -188,6 +195,7 @@ public class MainController implements Initializable {
 
         if (!playlistName.isBlank()) {
             model.createPlaylist(playlistName);
+
         } else {
             a.setAlertType(Alert.AlertType.ERROR);
             a.setContentText("Please fill in all fields");
@@ -197,6 +205,8 @@ public class MainController implements Initializable {
         txtNewPlaylist.setText("");
         popupBg.setVisible(false);
         popupVBox.setVisible(false);
+        model.loadPlaylists();
+        tblPlaylist.setItems(model.getPlaylists());
     }
     @FXML
     private void btnNewSongClicked(ActionEvent event) {
@@ -298,6 +308,7 @@ public class MainController implements Initializable {
 
     @FXML
     private void btnPlayClicked(ActionEvent event) {
+        volumeSlider.setDisable(false);
         Song nextSong = null;
 
         try {
@@ -479,13 +490,36 @@ public class MainController implements Initializable {
 
     @FXML
     private void setVolume(MouseEvent event) {
-        mediaPlayer.setVolume(manager.getVolume());
+        //mediaPlayer.setVolume(manager.getVolume());
+        manager.setVolume(volumeSlider.getValue()/100);
     }
 
     @FXML
     private void btnChooseClicked(ActionEvent event) {
         String filepath =  manager.openFile(btnChoose.getScene().getWindow());
-        txtFilePath.setText(filepath);
+        if (filepath != null) {
+            txtFilePath.setText(filepath);
+
+            if (manager.getDuration() != null) {
+                String[] metaData = manager.getDuration();
+                txtSongTitle.setText(metaData[0]);
+                txtSongArtist.setText(metaData[1]);
+                txtTime.setText(metaData[2]);
+
+                //Selects the category from the metaData
+                if (metaData[3] != null && !metaData[3].isEmpty()) {
+                    for (Category c : choiceCategory.getItems()) {
+                        if (c.getCategory().toLowerCase().trim().equals(metaData[3].toLowerCase().trim())) {
+                            Category metaCategory = new Category(c.getId(), c.getCategory());
+                            choiceCategory.setValue(metaCategory);
+                        }
+                    }
+                }
+            }
+        } else {
+            txtFilePath.setText("No file selected");
+            txtTime.setText("");
+        }
     }
 
     @FXML
@@ -607,6 +641,7 @@ public class MainController implements Initializable {
         txtNewCategory.setVisible(false);
         btnAddCategory.setVisible(false);
         btnChooseCategory.setVisible(true);
+        choiceCategory.getSelectionModel().select(0);
     }
     private void openDeleteWindow() {
         popupBg.setVisible(true);

@@ -1,0 +1,159 @@
+/* Root styling */
+.root {
+    -fx-font-family: "Arial";
+    -fx-background-color: #fef8f0; /* Light cream background */
+    -fx-text-fill: #333;
+}
+
+/* Panel styling */
+.panel {
+    -fx-background-color: white;
+    -fx-border-color: #4CAF50; /* Green border */
+    -fx-border-radius: 10;
+    -fx-background-radius: 10;
+    -fx-padding: 15;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.1), 10, 0.2, 0, 4);
+}
+
+/* Button styling */
+.button {
+    -fx-background-color: #d62828; /* Christmas red */
+    -fx-text-fill: white;
+    -fx-font-size: 14px;
+    -fx-padding: 5;
+    -fx-border-radius: 5;
+    -fx-background-radius: 5;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.2), 5, 0.5, 0, 1);
+}
+
+.button:hover {
+    -fx-background-color: #ba2020; /* Darker red on hover */
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.3), 7, 0.5, 0, 2);
+}
+
+.button:pressed {
+    -fx-background-color: #9e1e1e; /* Even darker when pressed */
+}
+
+/* Text field and combo box styling */
+.text-field, .combo-box {
+    -fx-background-color: #fffaf3; /* Subtle warm white */
+    -fx-border-color: #ddd;
+    -fx-border-radius: 5;
+    -fx-background-radius: 5;
+    -fx-padding: 6;
+    -fx-text-fill: #333;
+}
+
+.text-field:focused, .combo-box:focused {
+    -fx-border-color: #4CAF50; /* Green focus border */
+}
+
+/* Table styling */
+.table-view {
+    -fx-background-color: white;
+    -fx-border-color: #ddd;
+    -fx-border-radius: 5;
+    -fx-padding: 10;
+    -fx-background-radius: 5;
+}
+
+.table-view .column-header-background {
+    -fx-background-color: #f2e8cf; /* Gold-like header background */
+    -fx-border-color: #4CAF50; /* Green border */
+}
+
+.table-view .cell {
+    -fx-background-color: white;
+    -fx-text-fill: #333;
+    -fx-border-color: #ddd;
+}
+
+.table-view .cell:hover {
+    -fx-background-color: #e8f5e9; /* Soft green hover */
+}
+
+/* Now playing section */
+.now-playing {
+    -fx-background-color: #dfffd6; /* Light green */
+    -fx-border-color: #4CAF50;
+    -fx-border-radius: 5;
+    -fx-background-radius: 5;
+    -fx-padding: 15;
+    -fx-font-size: 16px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #4CAF50; /* Green text */
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.1), 5, 0.5, 0, 2);
+}
+/* Choice box for categories */
+.choice-box {
+    -fx-background-color: #4CAF50;
+    -fx-text-fill: white;
+    -fx-border-color: #444;
+    -fx-border-radius: 2;
+    -fx-padding: 2;
+}
+.choice-box .context-menu {
+    -fx-background-color: #4CAF50;
+    -fx-text-fill: white;
+    -fx-border-color: #444;
+    -fx-border-radius: 2;
+}
+
+/* Modal styling */
+.dialog-pane {
+    -fx-background-color: white;
+    -fx-border-color: #d62828; /* Red border */
+    -fx-border-radius: 8;
+    -fx-background-radius: 8;
+    -fx-padding: 20;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.2), 10, 0.3, 0, 4);
+}
+
+.dialog-pane .content {
+    -fx-background-color: #fffaf3;
+    -fx-border-radius: 5;
+    -fx-padding: 10;
+}
+
+.dialog-pane .button-bar .button {
+    -fx-background-color: #4CAF50; /* Green buttons in modal */
+    -fx-text-fill: white;
+}
+
+.dialog-pane .button-bar .button:hover {
+    -fx-background-color: #3e8e41;
+}
+
+/* Scrollbar styling */
+.scroll-bar {
+    -fx-background-color: transparent;
+}
+
+.scroll-bar .thumb {
+    -fx-background-color: #d62828; /* Red scrollbar thumb */
+    -fx-border-radius: 5;
+}
+
+.scroll-bar .thumb:hover {
+    -fx-background-color: #ba2020;
+}
+/* Highlight the song currently "Now Playing" */
+#lblPlaying {
+    -fx-text-fill: #d62828;
+    -fx-font-weight: bold;
+}
+.popup-vbox {
+    -fx-background-color: #f2e8cf;
+    -fx-border-color: white;
+    -fx-border-width: 2px;
+    -fx-border-radius: 10px;
+    -fx-background-radius: 10px;
+    -fx-padding: 15px;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.5), 10, 0, 0, 3);
+    -fx-opacity: 1;
+}
+.popup-bg {
+    -fx-background-color: gray;
+    -fx-opacity: 0.25;
+}

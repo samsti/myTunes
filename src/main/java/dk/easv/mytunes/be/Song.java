@@ -87,7 +87,7 @@ public class Song {
 
     @Override
     public String toString() {
-        return getTitle() + " " + getArtist() + " " + getDuration() + " " + getFilePath();
+        return getTitle() + " - " + getArtist() + "\n\t\t\t\t\t\t" + getDuration();
     }
 
 }
