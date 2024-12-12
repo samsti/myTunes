@@ -9,7 +9,7 @@ import java.io.File;
 public class ChooseFile {
     File chosenFile;
     public ChooseFile(Window window) {
-        javafx.stage.FileChooser fileChooser = new javafx.stage.FileChooser();
+        FileChooser fileChooser = new FileChooser();
         //Sets the window title
         fileChooser.setTitle("Open Music File");
 
@@ -24,7 +24,7 @@ public class ChooseFile {
 
     }
 
-    public String getDuration() {
+    public String[] getDuration() {
         try {
             if (chosenFile == null) {
                 return null;
@@ -32,14 +32,24 @@ public class ChooseFile {
 
             Mp3File mp3file = new Mp3File(getSelectedFilePath());
             int durationInSeconds = (int) mp3file.getLengthInSeconds();
-
+            String title = "";
+            String artist = "";
+            if (mp3file.hasId3v1Tag() && mp3file.getId3v1Tag() != null) {
+                title = mp3file.getId3v1Tag().getTitle() != null ? mp3file.getId3v1Tag().getTitle() : "";
+                artist = mp3file.getId3v1Tag().getArtist() != null ? mp3file.getId3v1Tag().getArtist() : "";
+            }
+            else if (mp3file.hasId3v2Tag() && mp3file.getId3v2Tag() != null) {
+                title = mp3file.getId3v2Tag().getTitle() != null ? mp3file.getId3v2Tag().getTitle() : "";
+                artist = mp3file.getId3v2Tag().getArtist() !=null ? mp3file.getId3v2Tag().getArtist() : "";
+            }
             int minutes = durationInSeconds / 60;
             int seconds = durationInSeconds % 60;
-            return String.format("%d:%02d", minutes, seconds);
+            //return String.format("%d:%02d", minutes, seconds);
+            return new String[]{title, artist, String.format("%d:%02d", minutes, seconds)};
 
         } catch (Exception e) {
             e.printStackTrace();
-            return "Error reading file";
+            return null;
         }
     }
 

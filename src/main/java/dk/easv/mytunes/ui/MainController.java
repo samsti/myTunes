@@ -453,8 +453,12 @@ public class MainController implements Initializable {
         if (filepath != null) {
             txtFilePath.setText(filepath);
 
-            String duration = manager.getDuration();
-            txtTime.setText(duration);
+            if (manager.getDuration() != null) {
+                String[] metaData = manager.getDuration();
+                txtSongTitle.setText(metaData[0]);
+                txtSongArtist.setText(metaData[1]);
+                txtTime.setText(metaData[2]);
+            }
         } else {
             txtFilePath.setText("No file selected");
             txtTime.setText("");
