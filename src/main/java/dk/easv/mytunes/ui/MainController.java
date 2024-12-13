@@ -92,6 +92,7 @@ public class MainController implements Initializable {
     private boolean isPaused = false;
     private Song nextSong;
     private boolean isFilterMode = true;
+    private Playlist previouslyOpenedPlaylist;
 
 
     @Override
@@ -123,7 +124,7 @@ public class MainController implements Initializable {
 
         tblSongs.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
             if (newValue != null) {
-                //tblPlaylist.getSelectionModel().clearSelection();
+                tblPlaylist.getSelectionModel().clearSelection();
             }
         });
 
@@ -154,6 +155,7 @@ public class MainController implements Initializable {
                     try {
                         model.loadSongsOnPlaylist(newValue.getId());
                         lstSongsInPlaylist.setItems(model.getSongsOnPlaylist());
+                        previouslyOpenedPlaylist = tblPlaylist.getSelectionModel().getSelectedItem();
                     } catch (DBException e) {
                         e.printStackTrace();
                     }
@@ -675,12 +677,14 @@ public class MainController implements Initializable {
 
     public void addSongToPlaylist(ActionEvent actionEvent) {
         int songId = getSelectedSong().getId();
-        int playlistId = getSelectedPlaylist().getId();
-        model.addSongToPlaylist(playlistId, songId);
-        model.loadSongsOnPlaylist(playlistId);
-        model.getTotalPlaylistTime(playlistId);
-        getSelectedPlaylist().setNumberOfSongs(model.getNumberOfSongsInPlaylist(playlistId));
-        getSelectedPlaylist().setTotalDuration(String.valueOf(model.getTotalPlaylistTime(playlistId)));
+        //int playlistId = getSelectedPlaylist().getId();
+        if (previouslyOpenedPlaylist.getId() != -1) {
+            model.addSongToPlaylist(previouslyOpenedPlaylist.getId(), songId);
+            model.loadSongsOnPlaylist(previouslyOpenedPlaylist.getId());
+            model.getTotalPlaylistTime(previouslyOpenedPlaylist.getId());
+            previouslyOpenedPlaylist.setNumberOfSongs(model.getNumberOfSongsInPlaylist(previouslyOpenedPlaylist.getId()));
+            previouslyOpenedPlaylist.setTotalDuration(String.valueOf(model.getTotalPlaylistTime(previouslyOpenedPlaylist.getId())));
+        }
         tblPlaylist.refresh();
         lstSongsInPlaylist.setItems(model.getSongsOnPlaylist());
     }
