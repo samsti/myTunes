@@ -121,7 +121,7 @@
     -fx-background-size: cover;
 }
 /* Custom buttons for navigation (Back, Play, Next) */
-#btnBack, #btnPlay, #btnNext, #btnStop {
+#btnBack, #btnPlay, #btnNext, #btnStop, #btnAddSongToPlayList {
     -fx-background-color: linear-gradient(to bottom, #222, #111),
     linear-gradient(to bottom, #444, #333);
     -fx-border-color: #555;
@@ -151,6 +151,13 @@
     -fx-background-image: url('/dk/easv/mytunes/css/img/next.png');
     -fx-background-size: cover;
     -fx-background-position: center;
+}
+#btnAddSongToPlayList {
+    -fx-background-image: url('/dk/easv/mytunes/css/img/arrow.png');
+    -fx-background-size: cover;
+    -fx-background-position: center;
+    -fx-pref-width: 30px;
+    -fx-pref-height: 30px;
 }
 
 #btnBack:hover, #btnPlay:hover, #btnNext:hover {
