@@ -435,6 +435,7 @@ public class MainController implements Initializable {
 
         } catch (Exception e) {
             e.printStackTrace();
+            lblPlaying.textProperty().unbind();
             lblPlaying.setText(manager.getCurrentSongTitle() + " - path not found");
             setCurrentSelectedSong(nextSong);
             setCurrentSelectedSongInPlaylist(nextSong);
