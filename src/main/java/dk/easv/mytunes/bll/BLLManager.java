@@ -83,13 +83,17 @@ public class BLLManager {
         if (currentSong == null) {
             throw new IllegalArgumentException("Current song is null.");
         }
-
-        currentIndex = songList.indexOf(currentSong);
-
-        if (currentIndex != -1 && currentIndex < songList.size() - 1) {
-            return songList.get(currentIndex + 1);
+        for (int i = 0; i < songList.size(); i++) {
+            if (songList.get(i).getId() == currentSong.getId() && songList.get(i).getOrder() == currentSong.getOrder()) {
+                //setCurrentSongTitle(songList.get(i).getTitle());
+                currentIndex = i;
+                break;
+            }
         }
-
+        if (currentIndex != -1 && currentIndex < songList.size() - 1) {
+            setCurrentSongTitle(songList.get(currentIndex+1).getTitle());
+        return songList.get(currentIndex + 1);
+    }
         return null;
     }
 
@@ -102,6 +106,7 @@ public class BLLManager {
         int currentIndex = songList.indexOf(currentSong);
 
         if (currentIndex > 0) {
+            setCurrentSongTitle(songList.get(currentIndex-1).getTitle());
             return songList.get(currentIndex - 1);
         }
 
@@ -160,6 +165,7 @@ public class BLLManager {
         List<Song> playlistSongs = new ArrayList<>(getSongsOnPlaylist(playlist.getId()));
 
 
+        assert song != null;
         String filePath = song.getFilePath();
         Path path = Paths.get(filePath);
 
@@ -174,6 +180,7 @@ public class BLLManager {
         }
 
         currentSong = song;
+        setCurrentSongTitle(currentSong.getTitle());
 
         if (!Files.exists(path)) {
             throw new Exception("No path found");
@@ -185,8 +192,12 @@ public class BLLManager {
             mediaPlayer.play();
 
             mediaPlayer.setOnEndOfMedia(() -> {
-                System.out.println("Song finished playing.");
-                mediaPlayer.stop();
+                try {
+                    playSongInPlaylist(findNextSong(playlistSongs, currentSong), playlist);
+                    setCurrentSongTitle(currentSong.getTitle());
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
             });
         }
     }

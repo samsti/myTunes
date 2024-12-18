@@ -51,7 +51,7 @@ public class DALManager {
 
 
     public List<Song> getFilteredSongs(String filter) {
-        List<Song> filteredSongs = new ArrayList();
+        List<Song> filteredSongs = new ArrayList<>();
         try (Connection con = cm.getConnection()) {
             String sqlcommandSelect = "SELECT * FROM songs WHERE title LIKE ? OR artist LIKE ?;";
             PreparedStatement pstmtSelect = con.prepareStatement(sqlcommandSelect);
@@ -75,7 +75,7 @@ public class DALManager {
     }
 
     public List<Playlist> getAllPlaylists() {
-        List<Playlist> playlists = new ArrayList();
+        List<Playlist> playlists = new ArrayList<>();
         try (Connection con = cm.getConnection()) {
             String sqlcommandSelect = "SELECT * FROM playlists";
             PreparedStatement pstmtSelect = con.prepareStatement(sqlcommandSelect);
@@ -95,7 +95,7 @@ public class DALManager {
     }
 
     public List<Category> getAllCategories() {
-        List<Category> categories = new ArrayList();
+        List<Category> categories = new ArrayList<>();
         try (Connection con = cm.getConnection()) {
             String sqlcommandSelect = "SELECT * FROM category";
             PreparedStatement pstmtSelect = con.prepareStatement(sqlcommandSelect);
@@ -130,7 +130,7 @@ public class DALManager {
     }
 
     public List<Song> getSongsOnPlaylist(int playlistId) {
-        List<Song> songsOnPlaylist = new ArrayList();
+        List<Song> songsOnPlaylist = new ArrayList<>();
         try (Connection con = cm.getConnection()) {
             String sqlcommandSelect = "SELECT s.id, s.title, s.artist, s.duration, s.file_path, s.category, sip.[order] FROM songs_in_playlist sip JOIN songs s ON sip.songId = s.id WHERE sip.playlistId = ? ORDER BY sip.[order];";
             PreparedStatement pstmtSelect = con.prepareStatement(sqlcommandSelect);

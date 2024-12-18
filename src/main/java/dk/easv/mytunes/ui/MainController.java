@@ -5,12 +5,12 @@ import dk.easv.mytunes.be.Playlist;
 import dk.easv.mytunes.be.Song;
 import dk.easv.mytunes.bll.BLLManager;
 import dk.easv.mytunes.exceptions.DBException;
+import javafx.beans.binding.Bindings;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
@@ -88,9 +88,6 @@ public class MainController implements Initializable {
     @FXML private Button btnBack;
     private final static String DELETING_DEFAULT_TEXT = "Are you sure you want to delete ";
     private BLLManager manager;
-    private MediaPlayer mediaPlayer;
-    private boolean isPaused = false;
-    private Song nextSong;
     private boolean isFilterMode = true;
     private Playlist previouslyOpenedPlaylist;
 
@@ -101,7 +98,7 @@ public class MainController implements Initializable {
         popupBg.setPrefWidth(rootPane.getWidth());
         popupBg.setPrefHeight(rootPane.getHeight());
         loadSongs();
-        lblVolume.setText(String.valueOf(manager.getVolume()) + "%");
+        lblVolume.setText(manager.getVolume() + "%");
 
        // Adds a listener to any slider changes
         volumeSlider.valueProperty().addListener(new ChangeListener<Number>() {
@@ -127,9 +124,6 @@ public class MainController implements Initializable {
                 tblPlaylist.getSelectionModel().clearSelection();
             }
         });
-
-
-
     }
 
 
@@ -333,19 +327,22 @@ public class MainController implements Initializable {
                     lblPlaying.setText("No song selected in playlist");
                     return;
                 }
-                System.out.println(lstSongsInPlaylist.getItems());
-
                 manager.playSongInPlaylist(playlistSong, playlistToPlay);
-                lblPlaying.setText("Playing: " + playlistSong.getTitle() + " from playlist " + playlistToPlay.getName());
+                lblPlaying.textProperty().bind(Bindings.createStringBinding(
+                        () -> "Playing: " + manager.currentSongTitleProperty().get() + " - " + playlistToPlay.getName(),
+                        manager.currentSongTitleProperty()
+                ));
             }
         } catch (Exception e) {
             e.printStackTrace();
 
             if (getSelectedSong() != null && getSelectedPlaylist() == null) {
                 nextSong = manager.getCurrentSong();
+                lblPlaying.textProperty().unbind();
                 lblPlaying.setText(nextSong.getTitle() + " - path not found");
             } if(getSelectedPlaylist() != null && getSelectedSongInPlaylist() != null) {
                 nextSong = manager.getCurrentSong();
+                lblPlaying.textProperty().unbind();
                 lblPlaying.setText(nextSong.getTitle() + " - path not found");
             }
         }
@@ -356,7 +353,9 @@ public class MainController implements Initializable {
     private void btnStopClicked(ActionEvent event) {
         try {
             manager.stopSong();
-            isPaused = false;
+            lblPlaying.textProperty().unbind();
+            lblPlaying.setText("Playing: ");
+            boolean isPaused = false;
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -369,6 +368,7 @@ public class MainController implements Initializable {
         int index = songList.indexOf(song);
         tblSongs.getSelectionModel().select(index);
         tblSongs.scrollTo(index);
+        lblPlaying.setText("Playing: " + song.getTitle());
     }
 
     private void setCurrentSelectedSongInPlaylist(Song song) {
@@ -418,12 +418,17 @@ public class MainController implements Initializable {
                     nextSong = manager.findNextSong(songList, currentSong);
 
                     if (manager.getCurrentIndex() >= songList.size() - 1) {
+                        lblPlaying.textProperty().unbind();
                         lblPlaying.setText("No more songs available in playlist");
                     }
                     else {
                         manager.playSongInPlaylist(nextSong, currentPlaylist);
+                        lblPlaying.textProperty().bind(Bindings.createStringBinding(
+                                () -> "Playing: " + manager.currentSongTitleProperty().get(),
+                                manager.currentSongTitleProperty()
+                        ));
                         setCurrentSelectedSongInPlaylist(nextSong);
-                        lblPlaying.setText("Now playing: " + nextSong.getTitle() + "in Playlist: " + currentPlaylist.getName());
+                        //lblPlaying.setText("Now playing: " + nextSong.getTitle() + " in Playlist: " + currentPlaylist.getName());
                     }
                 }
 
@@ -457,8 +462,12 @@ public class MainController implements Initializable {
                 if (previousSong != null) {
                     manager.playSong(previousSong);
                     setCurrentSelectedSong(previousSong);
-                    lblPlaying.setText("Now playing: " + previousSong.getTitle());
+                    lblPlaying.textProperty().bind(Bindings.createStringBinding(
+                            () -> "Playing: " + manager.currentSongTitleProperty().get(),
+                            manager.currentSongTitleProperty()
+                    ));
                 } else {
+                    lblPlaying.textProperty().unbind();
                     lblPlaying.setText("No previous song available.");
                 }
             }
@@ -472,14 +481,20 @@ public class MainController implements Initializable {
                 if (previousSong != null) {
                     manager.playSongInPlaylist(previousSong, currentPlaylist);
                     setCurrentSelectedSongInPlaylist(previousSong);
-                    lblPlaying.setText("Now playing: " + previousSong.getTitle() + " in Playlist: " + currentPlaylist.getName());
+                    lblPlaying.textProperty().bind(Bindings.createStringBinding(
+                            () -> "Playing: " + manager.currentSongTitleProperty().get() + " - " + currentPlaylist.getName(),
+                            manager.currentSongTitleProperty()
+                    ));
+                    //lblPlaying.setText("Now playing: " + previousSong.getTitle() + " in Playlist: " + currentPlaylist.getName());
                 } else {
+                    lblPlaying.textProperty().unbind();
                     lblPlaying.setText("No previous song available in playlist.");
                 }
             }
 
         } catch (Exception e) {
             e.printStackTrace();
+            lblPlaying.textProperty().unbind();
             lblPlaying.setText(manager.getCurrentSongTitle() + " - path not found");
             setCurrentSelectedSong(previousSong);
             setCurrentSelectedSongInPlaylist(previousSong);
